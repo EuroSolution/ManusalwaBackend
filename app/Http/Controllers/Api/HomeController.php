@@ -12,6 +12,7 @@ use App\Models\ContactQuery;
 use App\Models\Deal;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\DeliveryTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -108,7 +109,9 @@ class HomeController extends Controller
 
     public function siteSetting(Request $request){
         try{
-            $data = Setting::all();
+            $deliveryTime = DeliveryTime::all();
+            $setting = Setting::all();
+            $data = array('delivery_times' => $deliveryTime, 'setting' => $setting);
             return $this->success($data);
         }catch(\Exception $ex){
             return $this->error($ex->getMessage());

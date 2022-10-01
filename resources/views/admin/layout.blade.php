@@ -7,7 +7,7 @@ $notifications = \App\Models\Notification::where('receiver_id', 1)->where('read_
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title') - Pizzeria Admin</title>
+    <title>@yield('title') - Manusalwa Admin</title>
     <meta name="csrf-token" content="{{csrf_token()}}">
 
     <!-- Google Font: Source Sans Pro -->

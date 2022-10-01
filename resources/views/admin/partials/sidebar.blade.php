@@ -117,6 +117,13 @@
                             <p>Area Code</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{route('admin.deliveryTime')}}"
+                           class="nav-link {{ str_contains(url()->current(), 'delivery-time/') ? 'active' : '' }}">
+                            <i class="nav-icon fa fa-angle-double-right"></i>
+                            <p>Delivey Time</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">

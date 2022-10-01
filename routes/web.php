@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\HomeController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\DeliveryTimesController;
 use App\Http\Controllers\Staff\OrdersController AS staffOrdersController;
 
 /*
@@ -114,6 +115,11 @@ Route::middleware('admin')->name('admin.')->group(function (){
     Route::match(['get','post'],'add/staff',[StaffController::class, 'add'])->name('addStaff');
     Route::match(['get','post'],'/staff/edit/{id}',[StaffController::class, 'edit'])->name('staffEdit');
     Route::delete('staff/destroy/{id}', [StaffController::class, 'destroy'])->name('staffDestroy');
+
+    Route::get('delivery-time', [DeliveryTimesController::class, 'index'])->name('deliveryTime');
+    Route::match(['get','post'],'add/delivery-time', [DeliveryTimesController::class, 'add'])->name('addDeliveryTime');
+    Route::match(['get','post'], 'edit/delivery-time/{id}',[DeliveryTimesController::class, 'edit'])->name('editDeliveryTime');
+    Route::delete('destroy/delivery-time/{id}',[DeliveryTimesController::class, 'destroy'])->name('destroyDeliveryTime');
 
 });
 Route::patch('/fcm-token', [AdminController::class, 'updateToken'])->name('fcmToken');
