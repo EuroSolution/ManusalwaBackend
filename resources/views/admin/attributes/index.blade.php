@@ -46,6 +46,8 @@
                                     <thead>
                                     <tr style="text-align: center">
                                         <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Category</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
@@ -114,6 +116,8 @@
                 },
                 columns: [
                     {data: 'name', name: 'name'},
+                    {data: 'type', name: 'type'},
+                    {data: 'category_id', name: 'category_id'},
                     {data: 'action', name: 'action', orderable: false}
                 ]
 

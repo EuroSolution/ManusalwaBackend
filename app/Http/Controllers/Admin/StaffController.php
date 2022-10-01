@@ -30,23 +30,28 @@ class StaffController extends Controller
         if($request->method()=='POST'){
             $validator = Validator::make($request->all(),[
                 'name' => 'required',
-                'email' => 'required|email',
-                'password' => 'required',
-                'phone' => 'required'
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:8',
+                'phone' => 'required|min:10|max:15|unique:users'
             ]);
 
             if ($validator->fails()){
                 return redirect()->back()->withErrors($validator->errors())->withInput();
             }
 
-            User::create([
-                'name' => $request->input('name'),
-                'email' => $request->input('email'),
-                'phone' => $request->input('phone'),
-                'password' => Hash::make($request->input('password')),
-                'role_id' => 3,
-                'status' => 1,
-            ]);
+            try{
+                User::create([
+                    'name' => $request->input('name'),
+                    'email' => $request->input('email'),
+                    'phone' => $request->input('phone'),
+                    'password' => Hash::make($request->input('password')),
+                    'role_id' => 3,
+                    'status' => 1,
+                ]);
+            }catch(\Exception $ex){
+                
+                return redirect()->back()->with(['error' => $ex->getMessage()]);
+            }
             return redirect()->back()->with(['success' => 'Member Added Successfully']);
         }
         return view('admin.staff.add-staff');
