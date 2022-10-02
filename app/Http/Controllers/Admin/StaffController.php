@@ -63,17 +63,17 @@ class StaffController extends Controller
             if($request->input('editCheck') && $request->input('editCheck') == 'yes'){
                 $validator = Validator::make($request->all(),[
                     'name' => 'required',
-                    'email' => 'required|email|unique:users',
+                    'email' => 'required|email',
                     'password' => 'required|min:8',
-                    'phone' => 'required|min:10|max:15|unique:users'
+                    'phone' => 'required|min:10|max:15'
                 ]);
 
                 $password = $request->input('password');
             }else{
                 $validator = Validator::make($request->all(),[
                     'name' => 'required',
-                    'email' => 'required|email|unique:users',
-                    'phone' => 'required|min:10|max:15|unique:users'
+                    'email' => 'required|email',
+                    'phone' => 'required|min:10|max:15'
                 ]);
 
                 $password = null;
