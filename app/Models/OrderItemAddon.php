@@ -11,6 +11,6 @@ class OrderItemAddon extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'order_item_id', 'addon_item_id', 'addon_group', 'addon_item', 'price', 'quantity'
+        'order_item_id', 'addon_item_id', 'addon_group', 'addon_item', 'price', 'quantity', 'size'
     ];
 }

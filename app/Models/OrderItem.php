@@ -10,7 +10,7 @@ class OrderItem extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'order_id', 'product_id', 'price', 'size', 'quantity'
+        'order_id', 'product_id', 'price', 'size', 'quantity', 'deal_id', 'deal_item_id'
     ];
 
     public function orderItemAddons(){

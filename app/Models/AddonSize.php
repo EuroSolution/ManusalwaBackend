@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CartItemAddon extends Model
+class AddonSize extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'cart_item_id', 'addon_item_id', 'addon_group', 'addon_item', 'price', 'quantity', 'size'
+        'addon_item_id', 'size', 'price', 'discounted_price'
     ];
+    public $timestamps = false;
 }

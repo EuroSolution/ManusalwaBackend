@@ -71,16 +71,17 @@ class OrderController extends Controller
             ->where('user_id', Auth::id())->first();
         $discount = 0;
         $couponId = null;
-        if ($cart->voucher_code != null){
-            $resp = Coupon::validateCoupon($cart->voucher_code, $cart->subtotal);
-            if ($resp['isValidCoupon'] == true){
-                $discount = $resp['discount'];
-                $couponId = $resp['voucher']->id;
-            }else{
-                return $this->error($resp['couponErrorMsg']);
-            }
-        }
         try {
+            if ($cart->voucher_code != null){
+                $resp = Coupon::validateCoupon($cart->voucher_code, $cart->subtotal);
+                if ($resp['isValidCoupon'] == true){
+                    $discount = $resp['discount'];
+                    $couponId = $resp['voucher']->id;
+                }else{
+                    return array('status'=>false, 'msg'=>$resp['couponErrorMsg']);
+                }
+            }
+
             $today = date("Ymd");
             $rand = strtoupper(substr(uniqid(sha1(time())), 0, 4));
             $order_no = $today . $rand;
@@ -115,7 +116,9 @@ class OrderController extends Controller
                         'product_id' => $cartItem->product_id,
                         'price' => $cartItem->price,
                         'size' => $cartItem->size,
-                        'quantity' => $cartItem->quantity
+                        'quantity' => $cartItem->quantity,
+                        'deal_id' => $cartItem->deal_id,
+                        'deal_item_id' => $cartItem->deal_item_id,
                     ]);
 
                     if (!empty($cartItem->cartItemAddons) && $cartItem->cartItemAddons != null){
@@ -126,7 +129,8 @@ class OrderController extends Controller
                                 'addon_group'   => $cartItemAddon->addon_group,
                                 'addon_item'    => $cartItemAddon->addon_item,
                                 'price'         => $cartItemAddon->price,
-                                'quantity'      => $cartItemAddon->quantity
+                                'quantity'      => $cartItemAddon->quantity,
+                                'size'      => $cartItemAddon->size,
                             ]);
                         }
                     }

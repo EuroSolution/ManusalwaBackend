@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProfileController;
 use Illuminate\Http\Request;
@@ -22,11 +23,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('banners', [HomeController::class, 'banners']);
 Route::get('menu', [HomeController::class, 'menu']);
 Route::get('deals', [HomeController::class, 'deals']);
+Route::get('deals/{id}', [HomeController::class, 'dealById']);
 Route::get('products', [HomeController::class, 'products']);
+Route::post('search', [HomeController::class, 'searchProducts']);
 Route::get('product/{id}', [HomeController::class, 'productById']);
 Route::get('area-code-charges', [HomeController::class, 'areaCodeCharges']);
 Route::get('setting', [HomeController::class, 'siteSetting']);
 Route::post('contact-us', [HomeController::class, 'contactUs']);
+Route::post('send-push-notification', [NotificationController::class, 'sendNotification']);
 
 Route::prefix('auth')->group(function(){
     Route::post('login', [AuthController::class, 'login']);

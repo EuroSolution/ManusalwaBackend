@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AddonGroup;
 use App\Models\AddonItem;
+use App\Models\AddonSize;
 use Illuminate\Http\Request;
 
 class AddonItemController extends Controller
@@ -34,7 +35,6 @@ class AddonItemController extends Controller
             $this->validate($request, [
                 'name' => 'required',
                 'addon_group' => 'required',
-                'price' => 'required',
             ]);
             $item = AddonItem::create([
                 'addon_group_id' => $request->input('addon_group'),
@@ -43,21 +43,35 @@ class AddonItemController extends Controller
                 'discounted_price' => $request->input('discounted_price') ?? 0,
                 'description' => $request->input('description'),
             ]);
+
+            if (!empty($request->get('sizes'))){
+                foreach ($request->get('sizes') as $sKey => $size){
+                    if ($size != null){
+                        AddonSize::create([
+                            'addon_item_id' => $item->id,
+                            'size' => $size,
+                            'price' => $request->get('prices')[$sKey] ?? 0,
+                            'discounted_price' => 0,
+                        ]);
+                    }
+                }
+            }
+
             if ($request->has('file')){
                 $fileName = time() . '-' . $request->file('file')->getClientOriginalName();
                 $filePath = $request->file('file')->path();
                 $imageUrl = $this->uploadImageIK($fileName, $filePath, 'products');
                 $item->update(['image' => $imageUrl]);
             }
-
             return redirect()->back()->with('success', 'Addon Item Added Successfully');
         }
         $addonGroups = AddonGroup::get();
-        return view('admin.addon-item.create', compact('addonGroups'));
+        $sizes = array('small', 'medium', 'large');
+        return view('admin.addon-item.create', compact('addonGroups', 'sizes'));
     }
 
     public function edit(Request $request, $id){
-        $content = AddonItem::findOrFail($id);
+        $content = AddonItem::with('addonSizes')->findOrFail($id);
         if ($request->method() == 'POST'){
             $this->validate($request, [
                 'name' => 'required',
@@ -69,6 +83,19 @@ class AddonItemController extends Controller
             $content->discounted_price = $request->input('discounted_price') ?? 0;
             $content->save();
 
+            AddonSize::where('addon_item_id', $content->id)->delete();
+            if (!empty($request->get('sizes'))){
+                foreach ($request->get('sizes') as $sKey => $size){
+                    if ($size != null){
+                        AddonSize::create([
+                            'addon_item_id' => $content->id,
+                            'size' => $size,
+                            'price' => $request->get('prices')[$sKey] ?? 0,
+                            'discounted_price' =>  $request->get('discount_prices')[$sKey] ?? 0,
+                        ]);
+                    }
+                }
+            }
             if ($request->has('file')){
                 $fileName = time() . '-' . $request->file('file')->getClientOriginalName();
                 $filePath = $request->file('file')->path();
@@ -80,7 +107,8 @@ class AddonItemController extends Controller
             return redirect()->back()->with('success', 'Addon Item Updated Successfully');
         }
         $addonGroups = AddonGroup::get();
-        return view('admin.addon-item.create', compact('content', 'addonGroups'));
+        $sizes = array('small', 'medium', 'large');
+        return view('admin.addon-item.edit', compact('content', 'addonGroups', 'sizes'));
     }
 
     public function destroy(Request $request, $id){

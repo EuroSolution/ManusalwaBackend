@@ -12,7 +12,6 @@ use App\Models\ContactQuery;
 use App\Models\Deal;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\DeliveryTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -53,9 +52,29 @@ class HomeController extends Controller
         }
     }
 
+    public function dealById($id){
+        try{
+            $deal = Deal::with('dealItems.category.products', 'dealAddons')->where('status', 1)
+                ->where('id', $id)->orderBy('id', 'desc')->first();
+            return $this->success($deal);
+        }catch (\Exception $exception){
+            return $this->error($exception->getMessage());
+        }
+    }
+
     public function products(){
         try{
             $products = Product::with('category', 'sizes', 'addons', 'productAttributes')->get();
+            return $this->success($products);
+        }catch (\Exception $exception){
+            return $this->error($exception->getMessage());
+        }
+    }
+
+    public function searchProducts(Request $request){
+        try{
+            $products = Product::with('category')
+                ->where('name', 'LIKE', '%'.$request->keyword.'%')->get();
             return $this->success($products);
         }catch (\Exception $exception){
             return $this->error($exception->getMessage());
@@ -67,14 +86,14 @@ class HomeController extends Controller
             $product = Product::with('category', 'sizes', 'addons.addon', 'productAttributes.attributeItem.attribute')->find($id);
 
             if(!empty($product->addons) && $product->addons != null && count($product->addons) > 0){
-                $addons = AddonGroup::with('addonItems')->whereHas('addonItems', function ($q){
+                $addons = AddonGroup::with('category', 'addonItems.addonSizes')->whereHas('addonItems', function ($q){
                     $q->where('id', '!=', null);
-                })->get();
+                })->where('category_id', $product->category_id)->get();
             }else{
                 $addons = [];
             }
             if(!empty($product->productAttributes) && $product->productAttributes != null && count($product->productAttributes) > 0){
-                $attributes = Attribute::with('attributeItems')->get();
+                $attributes = Attribute::with('category', 'attributeItems')->where('category_id', $product->category_id)->get();
             }else{
                 $attributes = [];
             }
@@ -109,9 +128,7 @@ class HomeController extends Controller
 
     public function siteSetting(Request $request){
         try{
-            $deliveryTime = DeliveryTime::all();
-            $setting = Setting::all();
-            $data = array('delivery_times' => $deliveryTime, 'setting' => $setting);
+            $data = Setting::all();
             return $this->success($data);
         }catch(\Exception $ex){
             return $this->error($ex->getMessage());

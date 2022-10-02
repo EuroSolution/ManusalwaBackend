@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDealIdToCartsTable extends Migration
+class AddSizeColumnInOrderItemAddonsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class AddDealIdToCartsTable extends Migration
      */
     public function up()
     {
-        Schema::table('carts', function (Blueprint $table) {
-            $table->integer('deal_id')->after('user_id')->nullable();
-            $table->tinyInteger('is_deal')->after('total_amount')->default(0);
+        Schema::table('order_item_addons', function (Blueprint $table) {
+            $table->string('size')->after('quantity')->nullable();
         });
     }
 
@@ -26,8 +25,8 @@ class AddDealIdToCartsTable extends Migration
      */
     public function down()
     {
-        Schema::table('carts', function (Blueprint $table) {
-            $table->dropColumn(['deal_id','is_deal']);
+        Schema::table('order_item_addons', function (Blueprint $table) {
+            $table->dropColumn('size');
         });
     }
 }
