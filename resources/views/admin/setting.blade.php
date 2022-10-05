@@ -150,9 +150,9 @@
                                                 <div class="input-group-btn">
                                                     <div class="image-upload">
                                                         <img src="{{ isset($content->qr_code_image) ? $content->qr_code_image : 'admin/dist/img/placeholder.png' }}"
-                                                             class="img-responsive" width="100px" height="100px">
+                                                             class="img-responsive" width="100px" height="100px" id="imgResponsive">
                                                         <div class="file-btn mt-4">
-                                                            <input type="file" id="qr_code_image" name="qr_code_image" accept="image/*">
+                                                            <input type="file" id="qrcodeimage" name="qr_code_image" accept="image/*">
                                                             <input type="text" id="qr_code_image" name="qr_code_image"
                                                                    value="{{ !empty($content->qr_code_image) ? $content->qr_code_image : '' }}"
                                                                    hidden="">
@@ -221,7 +221,7 @@
                                                 <div class="input-group-btn">
                                                     <div class="image-upload">
                                                         <img src="{{ isset($content->logo) ? $content->logo : 'admin/dist/img/placeholder.png' }}"
-                                                             class="img-responsive" width="100px" height="100px">
+                                                             class="img-responsive" width="100px" height="100px" id="img0">
                                                         <div class="file-btn mt-4">
                                                             <input type="file" id="logo" name="logo" accept="image/*">
                                                             <input type="text" id="logo" name="logo"
@@ -246,4 +246,21 @@
             </div>
         </section>
     </div>
+@endsection
+@section('script')
+    <script>
+        $('#logo').on('change', function(){
+            const [file] = logo.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
+        });
+
+        $('#qrcodeimage').on('change', function(){
+            const [file] = qrcodeimage.files
+            if (file) {
+                imgResponsive.src = URL.createObjectURL(file)
+            }
+        });
+    </script>
 @endsection
