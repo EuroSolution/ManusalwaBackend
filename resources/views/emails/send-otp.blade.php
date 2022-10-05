@@ -7,7 +7,7 @@
     }
 </style>
 <div class="contactPage">
-    <h2 class="text-center">Manusalwa</h2>
+    <h2 class="text-center">Manoosalwa</h2>
     <div style="margin-bottom: 20px;">
         <span> {{$text ?? ''}}</span>
     </div>
