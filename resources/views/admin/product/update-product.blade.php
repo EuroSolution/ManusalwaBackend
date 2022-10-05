@@ -94,14 +94,14 @@
                                                         <label for="exampleInputFile">Product Image</label>
                                                         <div class="input-group">
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="category-image">
-                                                                <label class="custom-file-label" for="category-image">Choose file</label>
+                                                                <input type="file" class="custom-file-input" name="file" id="productImage">
+                                                                <label class="custom-file-label" for="productImage">Choose file</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -315,6 +315,13 @@
                 $input.val(count);
                 return false;
             });
+        });
+
+        $('#productImage').on('change', function(){
+            const [file] = productImage.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
         });
     </script>
 @endsection

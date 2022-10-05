@@ -69,7 +69,7 @@ class AdminController extends Controller
     public function setting(Request $request){
         $content = Setting::firstOrFail();
         if ($request->method() == 'POST'){
-            $content->title = $request->input('title') ?? 'Pizzeria';
+            $content->title = $request->input('title') ?? 'MannuSalwa';
             $content->email = $request->input('email');
             $content->phone = $request->input('phone');
             $content->address = $request->input('address');
