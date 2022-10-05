@@ -224,9 +224,6 @@
                                                              class="img-responsive" width="100px" height="100px" id="img0">
                                                         <div class="file-btn mt-4">
                                                             <input type="file" id="logo" name="logo" accept="image/*">
-                                                            <input type="text" id="logo" name="logo"
-                                                                   value="{{ !empty($content->logo) ? $content->logo : '' }}"
-                                                                   hidden="">
                                                         </div>
                                                     </div>
                                                 </div>
