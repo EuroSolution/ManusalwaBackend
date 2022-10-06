@@ -76,7 +76,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="category">Description</label>
-                                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" placeholder="Description" required>{{old('description') ?? $content->description ?? ''}}</textarea>
+                                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" placeholder="Description">{{old('description') ?? $content->description ?? ''}}</textarea>
                                                 @error('description')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
