@@ -127,7 +127,13 @@
                                                     @foreach($content->sizes as $sKey => $size)
                                                         @php $sizeCount++; @endphp
                                                         <tr id="row_size_{{$sKey}}" class="row_prod_size">
-                                                            <td><input type="text" class="form-control" name="sizes[{{$sKey}}]" placeholder="Size" value="{{$size->size ?? ''}}"></td>
+                                                            <td>
+                                                                <select class="form-control" name="sizes[{{$sKey}}]" id="">
+                                                                    @foreach ($productSizes as $productSize)
+                                                                        <option {{($productSize == $size->size)?'selected':''}} value="{{$productSize}}">{{$productSize}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><input type="text" class="form-control numberField" name="size_prices[{{$sKey}}]" placeholder="Price" value="{{$size->price ?? '0.00'}}"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow({{$sKey}})"></td>
                                                         </tr>
@@ -231,9 +237,19 @@
 @section('script')
     <script>
         var counter = {{$sizeCount??1}};
+        var productSizes = {!! json_encode($productSizes) !!}
+        
+        var sizes = '<option value="">Select</option>';
+        for(a = 0; a<productSizes.length; a++){
+            sizes += "<option value'"+productSizes[a]+"'>"+productSizes[a]+"</option>";
+        }
         function addMoreSizes(){
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-                <td><input type="text" class="form-control" name="sizes[]" placeholder="Size"></td>
+                <td>
+                <select class="form-control" name="sizes[]">
+                    ${sizes}
+                </select>
+                </td>
                 <td><input type="text" class="form-control" name="size_prices[]" placeholder="Price"></td>
                 <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
             </tr>`);

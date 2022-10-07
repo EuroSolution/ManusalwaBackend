@@ -105,7 +105,8 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::get();
-        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes'));
+        $productSizes = $this->produtSizes();
+        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes','productSizes'));
     }
 
 
@@ -172,7 +173,8 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::with('attributeItems')->get();
-        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes'));
+        $productSizes = $this->produtSizes();
+        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes', 'productSizes'));
     }
 
     public function destroy($id)

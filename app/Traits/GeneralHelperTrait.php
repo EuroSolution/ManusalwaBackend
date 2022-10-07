@@ -149,4 +149,13 @@ trait GeneralHelperTrait
             return array('success'=> false, 'error' => $ex->getMessage());
         }
     }
+
+    public function produtSizes(){
+        return array(
+            'Normal',
+            'Grob',
+            'Familie',
+            'Partry'
+        );
+    }
 }
