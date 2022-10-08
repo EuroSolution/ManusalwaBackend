@@ -62,7 +62,7 @@ class DealsController extends Controller
                         DealItem::create([
                             'deal_id' => $deal->id,
                             'product_id' => $productId,
-                            'quantity' => $request->input('prod_quantity')[$pKey],
+                            'quantity' => $request->input('prod_quantity')[$pKey] ?? 1,
                             'size' => $request->input('prod_size')[$pKey] ?? null,
                             'product_name' => $product->name,
                             'category_name'  => $product->category->name,
@@ -71,18 +71,20 @@ class DealsController extends Controller
                     }
                 }
             }
-            if (!empty($request->get('addons'))) {
+            if (!empty($request->get('addons')) && !empty($request->input('addon_items'))) {
                 foreach ($request->get('addons') as $aKey => $addonId) {
-                    $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
-                    if ($addonItem != null) {
-                        DealAddon::create([
-                            'deal_id' => $deal->id,
-                            'addon_group_id' => $addonId,
-                            'addon_item_id' => $request->input('addon_items')[$aKey],
-                            'quantity' => $request->input('addon_quantity')[$aKey],
-                            'addon_group_name' => $addonItem->addonGroup->name ?? '',
-                            'addon_item_name' => $addonItem->name ?? '',
-                        ]);
+                    if (isset($request->input('addon_items')[$aKey])) {
+                        $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
+                        if ($addonItem != null) {
+                            DealAddon::create([
+                                'deal_id' => $deal->id,
+                                'addon_group_id' => $addonId,
+                                'addon_item_id' => $request->input('addon_items')[$aKey],
+                                'quantity' => $request->input('addon_quantity')[$aKey] ?? 1,
+                                'addon_group_name' => $addonItem->addonGroup->name ?? '',
+                                'addon_item_name' => $addonItem->name ?? '',
+                            ]);
+                        }
                     }
                 }
             }
@@ -98,6 +100,14 @@ class DealsController extends Controller
         $content = Deal::with('dealItems', 'dealAddons')->findOrFail($id);
 
         if ($request->method() == "POST"){
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'description' => 'required',
+                'price' => 'required',
+            ]);
+            if ($validator->fails()){
+                return redirect()->back()->withErrors($validator->errors())->withInput();
+            }
             $content->name = $request->input('name');
             $content->description = $request->input('description');
             $content->price = $request->input('price');
@@ -117,7 +127,7 @@ class DealsController extends Controller
                         DealItem::create([
                             'deal_id' => $id,
                             'product_id' => $productId,
-                            'quantity' => $request->input('prod_quantity')[$pKey],
+                            'quantity' => $request->input('prod_quantity')[$pKey] ?? 1,
                             'size' => $request->input('prod_size')[$pKey] ?? null,
                             'product_name' => $product->name,
                             'category_name'  => $product->category->name,
@@ -128,18 +138,20 @@ class DealsController extends Controller
             }
 
             DealAddon::where('deal_id', $id)->delete();
-            if (!empty($request->get('addons'))) {
+            if (!empty($request->get('addons')) && !empty($request->input('addon_items'))) {
                 foreach ($request->get('addons') as $aKey => $addonId) {
-                    $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
-                    if ($addonItem != null) {
-                        DealAddon::create([
-                            'deal_id' => $id,
-                            'addon_group_id' => $addonId,
-                            'addon_item_id' => $request->input('addon_items')[$aKey],
-                            'quantity' => $request->input('addon_quantity')[$aKey],
-                            'addon_group_name' => $addonItem->addonGroup->name ?? '',
-                            'addon_item_name' => $addonItem->name ?? '',
-                        ]);
+                    if (isset($request->input('addon_items')[$aKey])) {
+                        $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
+                        if ($addonItem != null) {
+                            DealAddon::create([
+                                'deal_id' => $id,
+                                'addon_group_id' => $addonId,
+                                'addon_item_id' => $request->input('addon_items')[$aKey],
+                                'quantity' => $request->input('addon_quantity')[$aKey] ?? 1,
+                                'addon_group_name' => $addonItem->addonGroup->name ?? '',
+                                'addon_item_name' => $addonItem->name ?? '',
+                            ]);
+                        }
                     }
                 }
             }
