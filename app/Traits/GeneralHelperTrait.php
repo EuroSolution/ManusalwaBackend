@@ -150,7 +150,7 @@ trait GeneralHelperTrait
         }
     }
 
-    public function produtSizes(){
+    public function itemSizes(){
         return array(
             'Normal',
             'Grob',

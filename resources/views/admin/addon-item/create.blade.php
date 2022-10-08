@@ -125,10 +125,27 @@
 @endsection
 @section('script')
     <script>
+        
         var counter = 1;
+
+        var addonSizes = {!! json_encode($addonSizes) !!}
+        
+        var sizes = '<option value="">Select</option>';
+        for(a = 0; a<addonSizes.length; a++){
+            sizes += "<option value'"+addonSizes[a]+"'>"+addonSizes[a]+"</option>";
+        }
+
         function addMoreSizes(){
+            if(counter >= 5){
+                alert('can not add more than four sizes');
+                return false;
+            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-        <td><input type="text" class="form-control" name="sizes[]" placeholder="Size"></td>
+        <td>
+            <select class="form-control" name="sizes[]">
+                ${sizes}
+            </select>
+        </td>
         <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
         <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
         </tr>`);
@@ -136,6 +153,7 @@
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
+            counter--;
         }
 
         $('#dealImage').on('change', function(){

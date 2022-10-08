@@ -195,11 +195,9 @@
         }
 
         function addMoreSizes(){
-            // console.log(counter);
-            if(counter >= 4){
-                alert('can not add more than three sizes');
+            if(counter >= 5){
+                alert('can not add more than four sizes');
                 return false;
-                // $(this).prop('disabled', true);
             }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
             <td>

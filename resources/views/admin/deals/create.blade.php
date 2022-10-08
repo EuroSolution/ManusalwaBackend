@@ -160,7 +160,14 @@
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" class="form-control" name="prod_size[]" placeholder="Size"></td>
+            <td>
+                <select class="form-control" name="prod_size[]">
+                    <option value="">Select</option>
+                    @foreach($productSizes as $productSize)
+                        <option value="{{$productSize}}">{{$productSize}}</option>
+                    @endforeach
+                </select>
+            </td>
             <td><input type="text" class="form-control numberField" name="prod_quantity[]" placeholder="Quantity"></td>
             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeProductRow(${counter})"></td>
             </tr>`);

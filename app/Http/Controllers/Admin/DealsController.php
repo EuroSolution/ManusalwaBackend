@@ -90,7 +90,8 @@ class DealsController extends Controller
         }
         $products = Product::where('status', 1)->get();
         $addons = AddonGroup::with('addonItems')->get();
-        return view('admin.deals.create', compact('products', 'addons'));
+        $productSizes = $this->itemSizes();
+        return view('admin.deals.create', compact('products', 'addons', 'productSizes'));
     }
 
     public function edit(Request $request, $id){
@@ -146,7 +147,8 @@ class DealsController extends Controller
         }
         $products   = Product::where('status', 1)->get();
         $addons     = AddonGroup::with('addonItems')->get();
-        return view('admin.deals.edit', compact('content','products', 'addons'));
+        $productSizes = $this->itemSizes();
+        return view('admin.deals.edit', compact('content','products', 'addons','productSizes'));
     }
 
     public function show($id)

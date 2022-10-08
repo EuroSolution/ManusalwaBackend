@@ -105,7 +105,7 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::get();
-        $productSizes = $this->produtSizes();
+        $productSizes = $this->itemSizes();
         return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes','productSizes'));
     }
 
@@ -173,7 +173,7 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::with('attributeItems')->get();
-        $productSizes = $this->produtSizes();
+        $productSizes = $this->itemSizes();
         return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes', 'productSizes'));
     }
 

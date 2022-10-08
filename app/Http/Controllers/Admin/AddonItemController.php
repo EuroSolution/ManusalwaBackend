@@ -67,7 +67,8 @@ class AddonItemController extends Controller
         }
         $addonGroups = AddonGroup::get();
         $sizes = array('small', 'medium', 'large');
-        return view('admin.addon-item.create', compact('addonGroups', 'sizes'));
+        $addonSizes = $this->itemSizes();
+        return view('admin.addon-item.create', compact('addonGroups', 'sizes', 'addonSizes'));
     }
 
     public function edit(Request $request, $id){
@@ -107,7 +108,8 @@ class AddonItemController extends Controller
             return redirect()->back()->with('success', 'Addon Item Updated Successfully');
         }
         $addonGroups = AddonGroup::get();
-        $sizes = array('small', 'medium', 'large');
+        // $sizes = array('small', 'medium', 'large');
+        $sizes = $this->itemSizes();
         return view('admin.addon-item.edit', compact('content', 'addonGroups', 'sizes'));
     }
 

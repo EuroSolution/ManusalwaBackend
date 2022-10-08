@@ -108,7 +108,13 @@
                                                     @foreach($content->addonSizes as $aKey => $addonSize)
                                                         @php $countSizes++; @endphp
                                                         <tr id="row_size_{{$aKey}}" class="row_prod_size">
-                                                            <td><input type="text" class="form-control" name="sizes[]" value="{{$addonSize->size ?? ''}}" placeholder="Size"></td>
+                                                            <td>
+                                                                <select class="form-control" name="sizes[]" id="">
+                                                                    @foreach ($sizes as $size)
+                                                                        <option {{($size == $addonSize->size)?'selected':''}} value="{{$size}}">{{$size}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><input type="text" class="form-control numberField" value="{{$addonSize->price ?? ''}}" name="prices[]" placeholder="Price"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow({{$aKey}})"></td>
                                                         </tr>
@@ -136,16 +142,32 @@
 @section('script')
     <script>
         var counter = {{$countSizes}};
+
+        var sizes = {!! json_encode($sizes) !!}
+        var sizesOption = '<option value="">Select</option>';
+        for(a = 0; a<sizes.length; a++){
+            sizesOption += "<option value'"+sizes[a]+"'>"+sizes[a]+"</option>";
+        }
+
         function addMoreSizes(){
+            if(!(counter <= 3)){
+                alert('can not add more than four sizes');
+                return false;
+            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-        <td><input type="text" class="form-control" name="sizes[]" placeholder="Size"></td>
-        <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
-        <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-        </tr>`);
-            counter++;
+            <td>
+                <select class="form-control" name="sizes[]">
+                    ${sizesOption}
+                </select>
+            </td>
+            <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
+            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
+            </tr>`);
+                counter++;
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
+            counter--;
         }
 
         $('#dealImage').on('change', function(){

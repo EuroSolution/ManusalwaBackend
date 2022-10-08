@@ -236,7 +236,12 @@
 @endsection
 @section('script')
     <script>
+        
         var counter = {{$sizeCount??1}};
+        $(document).ready(function(){
+            // alert(counter);
+            
+        });
         var productSizes = {!! json_encode($productSizes) !!}
         
         var sizes = '<option value="">Select</option>';
@@ -244,6 +249,11 @@
             sizes += "<option value'"+productSizes[a]+"'>"+productSizes[a]+"</option>";
         }
         function addMoreSizes(){
+            
+            if(!(counter <= 3)){
+                alert('can not add more than four sizes');
+                return false;
+            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
                 <td>
                 <select class="form-control" name="sizes[]">
@@ -252,11 +262,13 @@
                 </td>
                 <td><input type="text" class="form-control" name="size_prices[]" placeholder="Price"></td>
                 <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-            </tr>`);
-            counter++;
+            </tr>`);;
+
+            counter++
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
+            --counter;
         }
         var counter2 = {{$addonCount??1}};
         function addMoreAddon(){
