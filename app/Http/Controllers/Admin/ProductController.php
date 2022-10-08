@@ -68,9 +68,9 @@ class ProductController extends Controller
                 }
             }
 
-            if (!empty($request->get('attributes'))){
+            if (!empty($request->get('attributes') && !empty($request->get('attribute_items')))){
                 foreach ($request->get('attributes') as $aKey => $attribute){
-                    if ($attribute != null){
+                    if ($attribute != null && isset($request->get('attribute_items')[$aKey])){
                         ProductAttribute::create([
                             'product_id' => $product->id,
                             'attribute_id' => $attribute,
