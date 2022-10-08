@@ -20,7 +20,7 @@ class CategoryController extends Controller
                         return $data->sub_category->name ?? 'NULL';
                     })
                     ->editColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->addColumn('action', function ($data) {
                         return '<a title="View" href="category/show/' . $data->id . '" class="btn btn-dark btn-sm"><i class="fas fa-eye"></i></a>&nbsp;<a title="edit" href="category/edit/' . $data->id . '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>&nbsp;<button title="Delete" type="button" name="delete" id="' . $data->id . '" class="delete btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>';

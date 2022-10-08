@@ -56,15 +56,20 @@ trait GeneralHelperTrait
                 env('IMAGEKIT_PRIVATE_KEY'),
                 env('IMAGEKIT_ENDPOINT_URL')
             );
-            return $imageKit->url([
-                'src' => $imageUrl,
-                'transformation' => [
-                    [
-                        'height' => $height,
-                        'width' => $width
+            if($imageUrl != null){
+                return $imageKit->url([
+                    'src' => $imageUrl,
+                    'transformation' => [
+                        [
+                            'height' => $height,
+                            'width' => $width
+                        ]
                     ]
-                ]
-            ]);
+                ]);
+            }else{
+                return asset('admin/dist/img/placeholder.png');
+            }
+            
         }catch(\Exception $ex){
 
         }

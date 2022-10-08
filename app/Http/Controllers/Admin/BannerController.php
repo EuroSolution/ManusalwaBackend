@@ -14,7 +14,7 @@ class BannerController extends Controller
             if (request()->ajax()) {
                 return datatables()->of(Banner::all())
                     ->addColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->editColumn('status', function ($data){
                         return ($data->status == 1) ? "Active" : "In-Active";

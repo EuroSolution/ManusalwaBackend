@@ -15,7 +15,7 @@ class AddonItemController extends Controller
             if (request()->ajax()) {
                 return datatables()->of(AddonItem::with('addonGroup')->get())
                     ->addColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->addColumn('addon_group', function ($data) {
                         return $data->addonGroup->name ?? '';

@@ -15,7 +15,7 @@ class AttributeItemController extends Controller
             if (request()->ajax()) {
                 return datatables()->of(AttributeItem::get())
                     ->editColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->addColumn('attribute_group', function ($data) {
                         return $data->attribute->name ?? '';

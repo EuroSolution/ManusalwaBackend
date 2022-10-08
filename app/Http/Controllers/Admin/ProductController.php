@@ -22,7 +22,7 @@ class ProductController extends Controller
             if (request()->ajax()) {
                 return datatables()->of(Product::with('category')->get())
                     ->addColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->addColumn('category_id', function ($data) {
                         return $data->category->name ?? '';
