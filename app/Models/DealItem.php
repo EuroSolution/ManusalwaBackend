@@ -11,4 +11,8 @@ class DealItem extends Model
     protected $fillable = [
         'deal_id', 'product_id', 'category_id', 'product_name', 'category_name', 'size', 'quantity'
     ];
+
+    public function category(){
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    }
 }
