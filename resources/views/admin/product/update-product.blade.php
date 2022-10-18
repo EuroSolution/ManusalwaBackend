@@ -76,7 +76,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="category">Description</label>
-                                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" placeholder="Description" required>{{old('description') ?? $content->description ?? ''}}</textarea>
+                                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" id="description" placeholder="Description">{{old('description') ?? $content->description ?? ''}}</textarea>
                                                 @error('description')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -94,14 +94,14 @@
                                                         <label for="exampleInputFile">Product Image</label>
                                                         <div class="input-group">
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="category-image">
-                                                                <label class="custom-file-label" for="category-image">Choose file</label>
+                                                                <input type="file" class="custom-file-input" name="file" id="productImage">
+                                                                <label class="custom-file-label" for="productImage">Choose file</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -127,7 +127,13 @@
                                                     @foreach($content->sizes as $sKey => $size)
                                                         @php $sizeCount++; @endphp
                                                         <tr id="row_size_{{$sKey}}" class="row_prod_size">
-                                                            <td><input type="text" class="form-control" name="sizes[{{$sKey}}]" placeholder="Size" value="{{$size->size ?? ''}}"></td>
+                                                            <td>
+                                                                <select class="form-control" name="sizes[{{$sKey}}]" id="">
+                                                                    @foreach ($productSizes as $productSize)
+                                                                        <option {{($productSize == $size->size)?'selected':''}} value="{{$productSize}}">{{$productSize}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><input type="text" class="form-control numberField" name="size_prices[{{$sKey}}]" placeholder="Price" value="{{$size->price ?? '0.00'}}"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow({{$sKey}})"></td>
                                                         </tr>
@@ -230,17 +236,39 @@
 @endsection
 @section('script')
     <script>
+        
         var counter = {{$sizeCount??1}};
+        $(document).ready(function(){
+            // alert(counter);
+            
+        });
+        var productSizes = {!! json_encode($productSizes) !!}
+        
+        var sizes = '<option value="">Select</option>';
+        for(a = 0; a<productSizes.length; a++){
+            sizes += "<option value'"+productSizes[a]+"'>"+productSizes[a]+"</option>";
+        }
         function addMoreSizes(){
+            
+            if(!(counter <= 3)){
+                alert('can not add more than four sizes');
+                return false;
+            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-                <td><input type="text" class="form-control" name="sizes[]" placeholder="Size"></td>
+                <td>
+                <select class="form-control" name="sizes[]">
+                    ${sizes}
+                </select>
+                </td>
                 <td><input type="text" class="form-control" name="size_prices[]" placeholder="Price"></td>
                 <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-            </tr>`);
-            counter++;
+            </tr>`);;
+
+            counter++
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
+            --counter;
         }
         var counter2 = {{$addonCount??1}};
         function addMoreAddon(){
@@ -315,6 +343,13 @@
                 $input.val(count);
                 return false;
             });
+        });
+
+        $('#productImage').on('change', function(){
+            const [file] = productImage.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
         });
     </script>
 @endsection

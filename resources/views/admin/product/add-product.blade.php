@@ -96,8 +96,8 @@
                                                         <label for="exampleInputFile">Product Image</label>
                                                         <div class="input-group">
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="category-image">
-                                                                <label class="custom-file-label" for="category-image">Choose file</label>
+                                                                <input type="file" class="custom-file-input" name="file" id="productImage">
+                                                                <label class="custom-file-label" for="productImage">Choose file</label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -187,16 +187,32 @@
 @section('script')
     <script>
         var counter = 1;
+        var productSizes = {!! json_encode($productSizes) !!}
+        
+        var sizes = '<option value="">Select</option>';
+        for(a = 0; a<productSizes.length; a++){
+            sizes += "<option value'"+productSizes[a]+"'>"+productSizes[a]+"</option>";
+        }
+
         function addMoreSizes(){
+            if(counter >= 5){
+                alert('can not add more than four sizes');
+                return false;
+            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-        <td><input type="text" class="form-control" name="sizes[]" placeholder="Size"></td>
-        <td><input type="text" class="form-control numberField" name="size_prices[]" placeholder="Price"></td>
-        <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-        </tr>`);
+            <td>
+            <select class="form-control" name="sizes[]">
+                ${sizes}
+            </select>
+            </td>
+            <td><input type="text" class="form-control numberField" name="size_prices[]" placeholder="Price"></td>
+            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
+            </tr>`);
             counter++;
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
+            --counter;
         }
         var counter2 = 1;
         function addMoreAddon(){
@@ -272,6 +288,20 @@
                 $input.val(count);
                 return false;
             });
+        });
+
+        /* categoryImage.onchange = evt => {
+            const [file] = categoryImage.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
+        } */
+
+        $('#productImage').on('change', function(){
+            const [file] = productImage.files
+            if (file) {
+                img_0.src = URL.createObjectURL(file)
+            }
         });
     </script>
 @endsection

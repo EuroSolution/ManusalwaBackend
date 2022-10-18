@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('title', 'Customer Detail')
+@section('title', 'Delivery-Tme Detail')
 @section('page_css')
 <link rel="stylesheet" href="//cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <style>
@@ -28,7 +28,7 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Customer Detail</h3>
+                            <h3 class="card-title">Delivery Detail</h3>
                         </div>
 
                         <!-- /.card-header -->

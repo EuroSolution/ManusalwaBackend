@@ -22,7 +22,7 @@ class ProductController extends Controller
             if (request()->ajax()) {
                 return datatables()->of(Product::with('category')->get())
                     ->addColumn('image', function ($data) {
-                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'">';
+                        return '<img class="cell-image" src="'.$this->getImageWithTransformation($data->image, 40, 40).'" width="40px" height="40px">';
                     })
                     ->addColumn('category_id', function ($data) {
                         return $data->category->name ?? '';
@@ -68,9 +68,9 @@ class ProductController extends Controller
                 }
             }
 
-            if (!empty($request->get('attributes'))){
+            if (!empty($request->get('attributes') && !empty($request->get('attribute_items')))){
                 foreach ($request->get('attributes') as $aKey => $attribute){
-                    if ($attribute != null){
+                    if ($attribute != null && isset($request->get('attribute_items')[$aKey])){
                         ProductAttribute::create([
                             'product_id' => $product->id,
                             'attribute_id' => $attribute,
@@ -105,7 +105,8 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::get();
-        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes'));
+        $productSizes = $this->itemSizes();
+        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes','productSizes'));
     }
 
 
@@ -172,7 +173,8 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::with('attributeItems')->get();
-        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes'));
+        $productSizes = $this->itemSizes();
+        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes', 'productSizes'));
     }
 
     public function destroy($id)

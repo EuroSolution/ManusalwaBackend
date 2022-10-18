@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('title', 'Customers')
+@section('title', 'Delivery')
 @section('css')
     <!-- Datatables -->
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -20,12 +20,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Customers</h1>
+                        <h1>Delivery Time</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Customers</li>
+                            <li class="breadcrumb-item active">Delivery Time</li>
                         </ol>
                     </div>
                 </div>

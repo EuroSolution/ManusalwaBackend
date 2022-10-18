@@ -7,7 +7,7 @@
     }
 </style>
 <div class="contactPage">
-    <h2 class="text-center">Pizzeria Roma</h2>
+    <h2 class="text-center">Mannosalwa</h2>
     <div style="margin-bottom: 20px;">
         <p>Hello {{$name??''}}</p>
         <p>Click below link to reset your password</p>

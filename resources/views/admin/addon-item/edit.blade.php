@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('title', (isset($content->id) ?  'Edit' : 'Add').' Addon Item')
+@section('title', 'Edit Addon Item')
 @section('content')
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -37,12 +37,14 @@
                                     </li>
                                 </ul>
                             </div>
-                            <form class="category-form" method="post" action="{{!empty($content->id)?route('admin.editAddonItems',$content->id):route('admin.addAddonItems')}}" enctype="multipart/form-data">
+                            <form class="category-form" method="post" action="{{route('admin.editAddonItems',$content->id)}}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="tab-content">
                                     <div role="tabpanel" class="tab-pane active" id="general">
                                         <div class="card-body">
-
+                                            @if(Session::has('msg'))
+                                                <div class="alert alert-success">{{Session::get('msg')}}</div>
+                                            @endif
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Select Addon Group</label>
                                                 <select class="form-control  @error('addon_group') is-invalid @enderror" name="addon_group" id="addon_group">
@@ -54,8 +56,8 @@
                                                 </select>
                                                 @error('addon_group')
                                                 <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                                 @enderror
                                             </div>
 
@@ -64,29 +66,27 @@
                                                 <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" value="{{$content->name?? old('name')}}" placeholder="Addon Name" required>
                                                 @error('name')
                                                 <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
                                                 @enderror
                                             </div>
-
-
-                                            <div class="row">
-                                                <div class="col-md-9">
-                                                    <div class="form-group">
-                                                        <label for="exampleInputFile">Image</label>
-                                                        <div class="input-group">
-                                                            <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="dealImage">
-                                                                <label class="custom-file-label" for="dealImage">Choose file</label>
+                                                <div class="row">
+                                                    <div class="col-md-9">
+                                                        <div class="form-group">
+                                                            <label for="exampleInputFile">Image</label>
+                                                            <div class="input-group">
+                                                                <div class="custom-file">
+                                                                    <input type="file" class="custom-file-input" name="file" id="dealImage">
+                                                                    <label class="custom-file-label" for="dealImage">Choose file</label>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
-                                                </div>
+                                                    <div class="col-md-3" >
+                                                        <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                                    </div>
 
-                                            </div>
+                                                </div>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="sizes">
@@ -103,7 +103,23 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody id="add_more_sizes">
-
+                                                @php $countSizes = 0; @endphp
+                                                @if($content->addonSizes != null && !empty($content->addonSizes))
+                                                    @foreach($content->addonSizes as $aKey => $addonSize)
+                                                        @php $countSizes++; @endphp
+                                                        <tr id="row_size_{{$aKey}}" class="row_prod_size">
+                                                            <td>
+                                                                <select class="form-control" name="sizes[]" id="">
+                                                                    @foreach ($sizes as $size)
+                                                                        <option {{($size == $addonSize->size)?'selected':''}} value="{{$size}}">{{$size}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
+                                                            <td><input type="text" class="form-control numberField" value="{{$addonSize->price ?? ''}}" name="prices[]" placeholder="Price"></td>
+                                                            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow({{$aKey}})"></td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
                                                 </tbody>
                                             </table>
                                         </div>
@@ -125,31 +141,29 @@
 @endsection
 @section('script')
     <script>
-        
-        var counter = 1;
+        var counter = {{$countSizes}};
 
-        var addonSizes = {!! json_encode($addonSizes) !!}
-        
-        var sizes = '<option value="">Select</option>';
-        for(a = 0; a<addonSizes.length; a++){
-            sizes += "<option value'"+addonSizes[a]+"'>"+addonSizes[a]+"</option>";
+        var sizes = {!! json_encode($sizes) !!}
+        var sizesOption = '<option value="">Select</option>';
+        for(a = 0; a<sizes.length; a++){
+            sizesOption += "<option value'"+sizes[a]+"'>"+sizes[a]+"</option>";
         }
 
         function addMoreSizes(){
-            if(counter >= 5){
+            if(!(counter <= 3)){
                 alert('can not add more than four sizes');
                 return false;
             }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-        <td>
-            <select class="form-control" name="sizes[]">
-                ${sizes}
-            </select>
-        </td>
-        <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
-        <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-        </tr>`);
-            counter++;
+            <td>
+                <select class="form-control" name="sizes[]">
+                    ${sizesOption}
+                </select>
+            </td>
+            <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
+            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
+            </tr>`);
+                counter++;
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();

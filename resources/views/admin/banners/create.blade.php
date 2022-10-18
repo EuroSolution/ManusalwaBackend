@@ -53,8 +53,8 @@
                                                 <label for="exampleInputFile">Banner Image</label>
                                                 <div class="input-group">
                                                     <div class="custom-file @error('image') is-invalid @enderror">
-                                                        <input type="file" class="custom-file-input" name="image"]>
-                                                        <label class="custom-file-label" for="category-image">Choose file</label>
+                                                        <input type="file" class="custom-file-input" name="image"] id="dealImage">
+                                                        <label class="custom-file-label" for="dealImage">Choose file</label>
                                                     </div>
                                                     @error('image')
                                                     <span class="invalid-feedback" role="alert">
@@ -65,7 +65,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-3" >
-                                            <img src="{{asset(isset($content->image) ? $content->image : 'admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
+                                            <img src="{{asset(isset($content->image) ? $content->image : 'admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
                                         </div>
 
                                     </div>
@@ -86,3 +86,14 @@
         </section>
     </div>
     @endsection
+    
+    @section('script')
+    <script>
+        $('#dealImage').on('change', function(){
+            const [file] = dealImage.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
+        });
+    </script>
+@endsection

@@ -56,15 +56,20 @@ trait GeneralHelperTrait
                 env('IMAGEKIT_PRIVATE_KEY'),
                 env('IMAGEKIT_ENDPOINT_URL')
             );
-            return $imageKit->url([
-                'src' => $imageUrl,
-                'transformation' => [
-                    [
-                        'height' => $height,
-                        'width' => $width
+            if($imageUrl != null){
+                return $imageKit->url([
+                    'src' => $imageUrl,
+                    'transformation' => [
+                        [
+                            'height' => $height,
+                            'width' => $width
+                        ]
                     ]
-                ]
-            ]);
+                ]);
+            }else{
+                return asset('admin/dist/img/placeholder.png');
+            }
+            
         }catch(\Exception $ex){
 
         }
@@ -148,5 +153,14 @@ trait GeneralHelperTrait
         }catch (Exception $ex){
             return array('success'=> false, 'error' => $ex->getMessage());
         }
+    }
+
+    public function itemSizes(){
+        return array(
+            'Normal',
+            'Grob',
+            'Familie',
+            'Partry'
+        );
     }
 }

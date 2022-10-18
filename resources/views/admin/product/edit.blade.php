@@ -809,5 +809,12 @@
                 }
             })
         });
+
+        $('#gallery_0').on('change', function(){
+            const [file] = gallery_0.files
+            if (file) {
+                img_0.src = URL.createObjectURL(file)
+            }
+        });
     </script>
 @endsection

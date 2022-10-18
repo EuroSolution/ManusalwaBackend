@@ -47,7 +47,6 @@
                                         <th>Image</th>
                                         <th>Name</th>
                                         <th>Addon Group</th>
-                                        <th>Price</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
@@ -118,7 +117,6 @@
                     {data: 'image', name: 'image'},
                     {data: 'name', name: 'name'},
                     {data: 'addon_group', name: 'addon_group'},
-                    {data: 'price', name: 'price'},
                     {data: 'action', name: 'action', orderable: false}
                 ]
 

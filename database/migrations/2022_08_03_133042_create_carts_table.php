@@ -16,12 +16,14 @@ class CreateCartsTable extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
+            $table->integer('deal_id')->nullable();
             $table->integer('cart_count');
             $table->decimal('subtotal')->default(0);
             $table->decimal('tax')->default(0.00);
             $table->decimal('delivery_fee')->default(0.00);
             $table->decimal('discount')->default(0.00);
             $table->decimal('total_amount')->default(0.00);
+            $table->tinyInteger('is_deal')->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
         });

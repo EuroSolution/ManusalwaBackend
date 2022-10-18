@@ -20,6 +20,9 @@ class AuthController extends Controller
         if ($validator->fails()){
             return $this->error('Validation Error', 200, [], $validator->errors());
         }
+        if (env('APP_ENV') != 'production'){
+            $request->phone = str_replace('+49', '+', $request->phone);
+        }
 
         $user = User::where('phone', $request->phone)->first();
         if ($user != null){
@@ -43,12 +46,15 @@ class AuthController extends Controller
 
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email', //|unique:users
             'phone' => 'required|unique:users',
             'password' => 'required|min:8',
         ]);
         if ($validator->fails()){
             return $this->error('Validation Error', 200, [], $validator->errors());
+        }
+        if (env('APP_ENV') != 'production'){
+            $request->phone = str_replace('+49', '+', $request->phone);
         }
         $otpToken = rand(10000, 99999);
         $user = User::create([
@@ -91,6 +97,9 @@ class AuthController extends Controller
             ]);
             if ($validator->fails()){
                 return $this->error('Validation Error', 200, [], $validator->errors());
+            }
+            if (env('APP_ENV') != 'production'){
+                $request->phone = str_replace('+49', '+', $request->phone);
             }
             $user = User::where('phone', $request->phone)->first();
         }
@@ -171,6 +180,9 @@ class AuthController extends Controller
         if ($validator->fails()){
             return $this->error('Validation Error', 200, [], $validator->errors());
         }
+        if (env('APP_ENV') != 'production'){
+            $request->phone = str_replace('+49', '+', $request->phone);
+        }
 
         $user = User::where('phone', $request->phone)->first();
         if ($user != null){
@@ -225,6 +237,9 @@ class AuthController extends Controller
             return $this->error('Validation Error', 200, [], $validator->errors());
         }
 
+        if (env('APP_ENV') != 'production'){
+            $request->phone = str_replace('+49', '+', $request->phone);
+        }
         $user = User::where('phone', $request->phone)->first();
         if ($user != null){
             try{

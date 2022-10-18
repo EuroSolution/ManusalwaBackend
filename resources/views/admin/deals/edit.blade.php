@@ -76,14 +76,14 @@
                                                         <label for="exampleInputFile">Image</label>
                                                         <div class="input-group">
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="category-image">
-                                                                <label class="custom-file-label" for="category-image">Choose file</label>
+                                                                <input type="file" class="custom-file-input" name="file" id="dealImage">
+                                                                <label class="custom-file-label" for="dealImage">Choose file</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -118,7 +118,14 @@
                                                                     @endforeach
                                                                 </select>
                                                             </td>
-                                                            <td><input type="text" class="form-control" name="prod_size[{{$dkey}}]" placeholder="Size" value="{{$dealitems->size??''}}"></td>
+                                                            <td>
+                                                                <select class="form-control" name="prod_size[{{$dkey}}]" id="">
+                                                                    <option value="">Select</option>
+                                                                    @foreach ($productSizes as $productSize)
+                                                                        <option {{($productSize == $dealitems->size)?'selected':''}} value="{{$productSize}}">{{$productSize}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><input type="text" class="form-control numberField" name="prod_quantity[{{$dkey}}]" placeholder="Quantity" value="{{$dealitems->quantity??''}}"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeProductRow({{$dkey}})"></td>
                                                         </tr>
@@ -202,7 +209,14 @@
                     @endforeach
                 </select>
             </td>
-            <td><input type="text" class="form-control" name="prod_size[]" placeholder="Size"></td>
+            <td>
+                <select class="form-control" name="prod_size[]">
+                    <option value="">Select</option>
+                    @foreach($productSizes as $productSize)
+                        <option value="{{$productSize}}">{{$productSize}}</option>
+                    @endforeach
+                </select>
+            </td>
             <td><input type="text" class="form-control numberField" name="prod_quantity[]" placeholder="Quantity"></td>
             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeProductRow(${counter})"></td>
             </tr>`);
@@ -275,6 +289,13 @@
                 $input.val(count);
                 return false;
             });
+        });
+
+        $('#dealImage').on('change', function(){
+            const [file] = dealImage.files
+            if (file) {
+                img0.src = URL.createObjectURL(file)
+            }
         });
     </script>
 @endsection

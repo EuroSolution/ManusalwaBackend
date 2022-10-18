@@ -134,3 +134,17 @@ Route::middleware('staff')->name('staff.')->group(function(){
     Route::get('staff/notifications', [staffOrdersController::class, 'showNotification'])->name('staffNotifications');
     // Route::post('update-notification', [AdminController::class, 'updateNotification'])->name('updateNotification');
 });
+
+Route::get('/cache-clear', function(){
+    
+    $q = request()->get('query');
+
+    try{
+        Artisan::call("$q:clear");
+    }catch(\Exception $x){
+        return $x->getMessage();
+    }
+
+    return "Cache Cleared....";
+
+});
