@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AddonGroup;
 use App\Models\AddonItem;
+use App\Models\Category;
 use App\Models\Deal;
 use App\Models\DealAddon;
 use App\Models\DealItem;
@@ -55,6 +56,25 @@ class DealsController extends Controller
                 $imageUrl = $this->uploadImageIK($fileName, $filePath, 'deals');
                 $deal->update(['image' => $imageUrl]);
             }
+            if (!empty($request->get('categories'))){
+                foreach ($request->get('categories') as $cKey => $item){
+                    $category = Category::find($item);
+                    if ($category != null){
+                        DealItem::create([
+                            'deal_id' => $deal->id,
+                            'product_id' => null,
+                            'quantity' => $request->input('prod_quantity')[$cKey],
+                            'size' => $request->input('prod_size')[$cKey] ?? null,
+                            'product_name' => null,
+                            'category_name'  => $category->name,
+                            'category_id'  => $category->id ?? $item
+                        ]);
+                    }
+                }
+            }
+            /*
+             * Deals with Products -> OLD Functionality
+             *
             if (!empty($request->get('products'))) {
                 foreach ($request->get('products') as $pKey => $productId) {
                     $product = Product::with('category')->where('id', $productId)->first();
@@ -62,7 +82,7 @@ class DealsController extends Controller
                         DealItem::create([
                             'deal_id' => $deal->id,
                             'product_id' => $productId,
-                            'quantity' => $request->input('prod_quantity')[$pKey] ?? 1,
+                            'quantity' => $request->input('prod_quantity')[$pKey],
                             'size' => $request->input('prod_size')[$pKey] ?? null,
                             'product_name' => $product->name,
                             'category_name'  => $product->category->name,
@@ -71,16 +91,17 @@ class DealsController extends Controller
                     }
                 }
             }
-            if (!empty($request->get('addons')) && !empty($request->input('addon_items'))) {
+            */
+            if (!empty($request->get('addons'))) {
                 foreach ($request->get('addons') as $aKey => $addonId) {
-                    if (isset($request->input('addon_items')[$aKey])) {
+                    if ($addonId != null && isset($request->input('addon_items')[$aKey])){
                         $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
                         if ($addonItem != null) {
                             DealAddon::create([
                                 'deal_id' => $deal->id,
                                 'addon_group_id' => $addonId,
                                 'addon_item_id' => $request->input('addon_items')[$aKey],
-                                'quantity' => $request->input('addon_quantity')[$aKey] ?? 1,
+                                'quantity' => $request->input('addon_quantity')[$aKey],
                                 'addon_group_name' => $addonItem->addonGroup->name ?? '',
                                 'addon_item_name' => $addonItem->name ?? '',
                             ]);
@@ -88,12 +109,13 @@ class DealsController extends Controller
                     }
                 }
             }
-            return redirect()->back()->with('success', 'Deal Created Successfully');
+            return redirect(route('admin.deals'))->with('success', 'Deal Created Successfully');
         }
+        $categories = Category::get();
         $products = Product::where('status', 1)->get();
         $addons = AddonGroup::with('addonItems')->get();
-        $productSizes = $this->itemSizes();
-        return view('admin.deals.create', compact('products', 'addons', 'productSizes'));
+        $sizes = $this->getSizes();
+        return view('admin.deals.create', compact('products', 'addons', 'categories', 'sizes'));
     }
 
     public function edit(Request $request, $id){
@@ -108,6 +130,7 @@ class DealsController extends Controller
             if ($validator->fails()){
                 return redirect()->back()->withErrors($validator->errors())->withInput();
             }
+
             $content->name = $request->input('name');
             $content->description = $request->input('description');
             $content->price = $request->input('price');
@@ -120,6 +143,25 @@ class DealsController extends Controller
             $content->save();
 
             DealItem::where('deal_id', $id)->delete();
+            if (!empty($request->get('categories'))){
+                foreach ($request->get('categories') as $cKey => $item){
+                    $category = Category::find($item);
+                    if ($category != null){
+                        DealItem::create([
+                            'deal_id' => $id,
+                            'product_id' => null,
+                            'quantity' => $request->input('prod_quantity')[$cKey],
+                            'size' => $request->input('prod_size')[$cKey] ?? null,
+                            'product_name' => null,
+                            'category_name'  => $category->name,
+                            'category_id'  => $category->id ?? $item
+                        ]);
+                    }
+                }
+            }
+            /*
+             * Deals with Products -> OLD Functionality
+             *
             if (!empty($request->get('products'))) {
                 foreach ($request->get('products') as $pKey => $productId) {
                     $product = Product::with('category')->where('id', $productId)->first();
@@ -127,7 +169,7 @@ class DealsController extends Controller
                         DealItem::create([
                             'deal_id' => $id,
                             'product_id' => $productId,
-                            'quantity' => $request->input('prod_quantity')[$pKey] ?? 1,
+                            'quantity' => $request->input('prod_quantity')[$pKey],
                             'size' => $request->input('prod_size')[$pKey] ?? null,
                             'product_name' => $product->name,
                             'category_name'  => $product->category->name,
@@ -136,31 +178,30 @@ class DealsController extends Controller
                     }
                 }
             }
-
+            */
             DealAddon::where('deal_id', $id)->delete();
-            if (!empty($request->get('addons')) && !empty($request->input('addon_items'))) {
+            if (!empty($request->get('addons')) && !empty($request->get('addon_items'))) {
                 foreach ($request->get('addons') as $aKey => $addonId) {
-                    if (isset($request->input('addon_items')[$aKey])) {
-                        $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
-                        if ($addonItem != null) {
-                            DealAddon::create([
-                                'deal_id' => $id,
-                                'addon_group_id' => $addonId,
-                                'addon_item_id' => $request->input('addon_items')[$aKey],
-                                'quantity' => $request->input('addon_quantity')[$aKey] ?? 1,
-                                'addon_group_name' => $addonItem->addonGroup->name ?? '',
-                                'addon_item_name' => $addonItem->name ?? '',
-                            ]);
-                        }
+                    $addonItem = AddonItem::with('addonGroup')->where('id', $request->input('addon_items')[$aKey])->first();
+                    if ($addonItem != null) {
+                        DealAddon::create([
+                            'deal_id' => $id,
+                            'addon_group_id' => $addonId,
+                            'addon_item_id' => $request->input('addon_items')[$aKey],
+                            'quantity' => $request->input('addon_quantity')[$aKey] ?? 1,
+                            'addon_group_name' => $addonItem->addonGroup->name ?? '',
+                            'addon_item_name' => $addonItem->name ?? '',
+                        ]);
                     }
                 }
             }
             return redirect()->back()->with('success', 'Deal Updated Successfully');
         }
+        $categories = Category::get();
         $products   = Product::where('status', 1)->get();
         $addons     = AddonGroup::with('addonItems')->get();
-        $productSizes = $this->itemSizes();
-        return view('admin.deals.edit', compact('content','products', 'addons','productSizes'));
+        $sizes = $this->getSizes();
+        return view('admin.deals.edit', compact('content','products', 'addons', 'categories', 'sizes'));
     }
 
     public function show($id)

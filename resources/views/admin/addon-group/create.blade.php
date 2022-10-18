@@ -41,11 +41,7 @@
                                         <select class="form-control  @error('category') is-invalid @enderror" name="category" id="category">
                                             <option value="">Select</option>
                                             @foreach($categories as $category)
-                                                @if (isset($content))
-                                                    <option {{(old('category') == $category->id || $content->category_id == $category->id) ? 'selected' : ''}} value="{{$category->id}}">{{$category->name ?? ''}}</option>
-                                                @else    
-                                                    <option {{(old('category') == $category->id) ? 'selected' : ''}} value="{{$category->id}}">{{$category->name ?? ''}}</option>
-                                                @endif
+                                                <option {{(old('category') == $category->id || (isset($content->category_id) && $content->category_id == $category->id)) ? 'selected' : ''}} value="{{$category->id}}">{{$category->name ?? ''}}</option>
                                             @endforeach
                                         </select>
                                         @error('category')
@@ -65,7 +61,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="type">Type</label>
-                                        <input type="text" class="form-control @error('type') is-invalid @enderror" name="type" id="type" value="{{$content->type?? old('type')}}" placeholder="Attribute Type" required>
+                                        <input type="text" class="form-control @error('type') is-invalid @enderror" name="type" id="type" value="{{$content->type?? old('type')}}" placeholder="Topping or Addon">
                                         @error('type')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

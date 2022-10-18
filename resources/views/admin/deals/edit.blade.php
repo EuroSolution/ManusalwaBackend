@@ -83,7 +83,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -98,7 +98,7 @@
                                             <table class="table table-bordered">
                                                 <thead>
                                                 <tr>
-                                                    <th>Product</th>
+                                                    <th>Category</th>
                                                     <th>Size (Optional)</th>
                                                     <th>Quantity</th>
                                                     <th>Action</th>
@@ -106,27 +106,26 @@
                                                 </thead>
                                                 <tbody id="add_more_products">
                                                     @php $prodcutCount = 0; @endphp
-                                                    @if ($content->dealitems != null && !empty($content->dealitems))
-                                                    @foreach ($content->dealitems as $dkey=>$dealitems)
+                                                    @if ($content->dealItems != null && !empty($content->dealItems))
+                                                    @foreach ($content->dealItems as $dkey => $dealItem)
                                                         @php $prodcutCount++; @endphp
                                                         <tr id="row_product_{{$dkey}}" class="row_product">
                                                             <td>
-                                                                <select class="form-control" name="products[{{$dkey}}]">
+                                                                <select class="form-control" name="categories[{{$dkey}}]">
                                                                     <option value="">Select</option>
-                                                                    @foreach($products as $product)
-                                                                        <option value="{{$product->id}}" @if($product->id == $dealitems->product_id) selected @endif>{{$product->name}}</option>
+                                                                    @foreach($categories as $category)
+                                                                        <option value="{{$category->id}}" @if($category->id == $dealItem->category_id) selected @endif>{{$category->name}}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </td>
                                                             <td>
-                                                                <select class="form-control" name="prod_size[{{$dkey}}]" id="">
-                                                                    <option value="">Select</option>
-                                                                    @foreach ($productSizes as $productSize)
-                                                                        <option {{($productSize == $dealitems->size)?'selected':''}} value="{{$productSize}}">{{$productSize}}</option>
+                                                                <select class="form-control" name="prod_size[{{$dkey}}]">
+                                                                    @foreach($sizes as $sizeKey => $sizeVal)
+                                                                        <option value="{{$sizeVal}}" @if($sizeVal == $dealItem->size) selected @endif>{{$sizeVal}}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </td>
-                                                            <td><input type="text" class="form-control numberField" name="prod_quantity[{{$dkey}}]" placeholder="Quantity" value="{{$dealitems->quantity??''}}"></td>
+                                                            <td><input type="text" class="form-control numberField" name="prod_quantity[{{$dkey}}]" placeholder="Quantity" value="{{$dealItem->quantity??'1'}}"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeProductRow({{$dkey}})"></td>
                                                         </tr>
                                                         @endforeach
@@ -202,21 +201,26 @@
         function addMoreProducts(){
             $("#add_more_products").append(`<tr id="row_product_${counter}" class="row_product">
             <td>
-                <select class="form-control" name="products[]">
+                <select class="form-control" name="categories[]">
                     <option value="">Select</option>
-                    @foreach($products as $product)
-                        <option value="{{$product->id}}">{{$product->name}}</option>
+                    @foreach($categories as $category)
+                        <option value="{{$category->id}}">{{$category->name}}</option>
                     @endforeach
                 </select>
             </td>
-            <td>
-                <select class="form-control" name="prod_size[]">
-                    <option value="">Select</option>
-                    @foreach($productSizes as $productSize)
-                        <option value="{{$productSize}}">{{$productSize}}</option>
-                    @endforeach
-                </select>
-            </td>
+            {{--<td>--}}
+            {{--    <select class="form-control" name="products[]">--}}
+            {{--        <option value="">Select</option>--}}
+            {{--        @foreach($products as $product)--}}
+            {{--            <option value="{{$product->id}}">{{$product->name}}</option>--}}
+            {{--        @endforeach--}}
+            {{--    </select>--}}
+            {{--</td>--}}
+            <td><select class="form-control" name="prod_size[]">
+                @foreach($sizes as $sizeKey => $sizeVal)
+                    <option value="{{$sizeVal}}">{{$sizeVal}}</option>
+                @endforeach
+            </select></td>
             <td><input type="text" class="form-control numberField" name="prod_quantity[]" placeholder="Quantity"></td>
             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeProductRow(${counter})"></td>
             </tr>`);
@@ -294,7 +298,7 @@
         $('#dealImage').on('change', function(){
             const [file] = dealImage.files
             if (file) {
-                img0.src = URL.createObjectURL(file)
+                img_0.src = URL.createObjectURL(file)
             }
         });
     </script>

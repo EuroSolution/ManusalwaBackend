@@ -76,14 +76,14 @@
                                                             <label for="exampleInputFile">Image</label>
                                                             <div class="input-group">
                                                                 <div class="custom-file">
-                                                                    <input type="file" class="custom-file-input" name="file" id="dealImage">
-                                                                    <label class="custom-file-label" for="dealImage">Choose file</label>
+                                                                    <input type="file" class="custom-file-input" name="file" id="addonItemImage">
+                                                                    <label class="custom-file-label" for="addonItemImage">Choose file</label>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-3" >
-                                                        <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                                        <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
                                                     </div>
 
                                                 </div>
@@ -92,7 +92,7 @@
                                     <div role="tabpanel" class="tab-pane" id="sizes">
                                         <div class="card-body">
                                             <div class="col-md-12 text-right">
-                                                <input type="button" class="btn btn-primary btn-sm" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
+                                                <input type="button" class="btn btn-primary btn-sm addMoreSizes" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
                                             </div>
                                             <table class="table table-bordered">
                                                 <thead>
@@ -105,16 +105,18 @@
                                                 <tbody id="add_more_sizes">
                                                 @php $countSizes = 0; @endphp
                                                 @if($content->addonSizes != null && !empty($content->addonSizes))
+                                                    @php $countSizes = count($content->addonSizes); @endphp
                                                     @foreach($content->addonSizes as $aKey => $addonSize)
-                                                        @php $countSizes++; @endphp
+
                                                         <tr id="row_size_{{$aKey}}" class="row_prod_size">
                                                             <td>
-                                                                <select class="form-control" name="sizes[]" id="">
-                                                                    @foreach ($sizes as $size)
-                                                                        <option {{($size == $addonSize->size)?'selected':''}} value="{{$size}}">{{$size}}</option>
+                                                                <select class="form-control" name="sizes[{{$aKey}}]">
+                                                                    @foreach($sizes as $sizeKey => $sizeVal)
+                                                                        <option value="{{$sizeVal}}" @if($sizeVal == $addonSize->size) selected @endif>{{$sizeVal}}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </td>
+{{--                                                            <td><input type="text" class="form-control" name="sizes[]" value="{{$addonSize->size ?? ''}}" placeholder="Size"></td>--}}
                                                             <td><input type="text" class="form-control numberField" value="{{$addonSize->price ?? ''}}" name="prices[]" placeholder="Price"></td>
                                                             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow({{$aKey}})"></td>
                                                         </tr>
@@ -141,40 +143,63 @@
 @endsection
 @section('script')
     <script>
-        var counter = {{$countSizes}};
-
-        var sizes = {!! json_encode($sizes) !!}
-        var sizesOption = '<option value="">Select</option>';
-        for(a = 0; a<sizes.length; a++){
-            sizesOption += "<option value'"+sizes[a]+"'>"+sizes[a]+"</option>";
+        var counter = {{$countSizes}}; console.log(counter);
+        if (counter == 3){
+            $(".addMoreSizes").attr('disabled', 'disabled');
         }
-
         function addMoreSizes(){
-            if(!(counter <= 3)){
-                alert('can not add more than four sizes');
-                return false;
-            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-            <td>
-                <select class="form-control" name="sizes[]">
-                    ${sizesOption}
-                </select>
-            </td>
+            <td><select class="form-control" name="sizes[]">
+                    @foreach($sizes as $sizeKey => $sizeVal)
+                <option value="{{$sizeVal}}">{{$sizeVal}}</option>
+                    @endforeach
+                </select></td>
             <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
             </tr>`);
-                counter++;
+            counter++;
+
+            if (counter >= 4){
+                $(".addMoreSizes").attr('disabled', 'disabled');
+            }
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
             counter--;
+            if (counter <= 4){
+                $(".addMoreSizes").attr('disabled', false);
+            }
         }
 
-        $('#dealImage').on('change', function(){
-            const [file] = dealImage.files
+        $('#addonItemImage').on('change', function(){
+            const [file] = addonItemImage.files
             if (file) {
-                img0.src = URL.createObjectURL(file)
+                img_0.src = URL.createObjectURL(file)
             }
+        });
+
+        $('#add_more_sizes').click(function(){
+            $(this).find('.numberField').click(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
+
+            $(this).find('.numberField').focusout(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
         });
     </script>
 @endsection

@@ -12,7 +12,7 @@ class Order extends Model
     protected $fillable = [
         'order_number', 'user_id', 'subtotal', 'tax', 'delivery_fee', 'discount', 'total_amount',
         'notes', 'name', 'email', 'phone', 'address', 'nearest_landmark', 'location', 'order_type',
-        'order_status', 'coupon_id', 'is_deal', 'deal_id'
+        'order_status', 'coupon_id', 'is_deal', 'deal_id', 'source'
     ];
 
     public function orderItems(){

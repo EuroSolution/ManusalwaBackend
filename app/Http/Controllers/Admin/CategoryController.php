@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AddonGroup;
+use App\Models\Attribute;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Str;
@@ -135,5 +137,17 @@ class CategoryController extends Controller
             $slug = $str;
         }
         return $slug;
+    }
+
+    public function getAddonsAttributesByCategoryId($id){
+        $addons = AddonGroup::with('addonItems')->whereHas('addonItems', function ($q){
+            $q->where('id', '!=', null);
+        })->where('category_id', $id)->get();
+        $atrributes = Attribute::where('category_id', $id)->get();
+
+        return array(
+            'addons' => $addons,
+            'attributes' => $atrributes
+        );
     }
 }

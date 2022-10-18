@@ -155,7 +155,7 @@ trait GeneralHelperTrait
         }
     }
 
-    public function itemSizes(){
+    public function getSizes(){
         return array(
             'Normal',
             'Grob',

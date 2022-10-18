@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AddonGroup;
 use App\Models\AddonItem;
 use App\Models\Attribute;
 use App\Models\ProductAddon;
@@ -53,6 +54,7 @@ class ProductController extends Controller
                 'description' => $request->input('description'),
                 'price' => $request->input('price') ?? 0.00,
                 'slug' => $this->createSlug($slugStr),
+                'type' => $request->input('type')
             ]);
 
             if (!empty($request->get('sizes'))){
@@ -68,9 +70,9 @@ class ProductController extends Controller
                 }
             }
 
-            if (!empty($request->get('attributes') && !empty($request->get('attribute_items')))){
+            if (!empty($request->get('attributes')) && !empty($request->get('attribute_items'))){
                 foreach ($request->get('attributes') as $aKey => $attribute){
-                    if ($attribute != null && isset($request->get('attribute_items')[$aKey])){
+                    if ($attribute != null){
                         ProductAttribute::create([
                             'product_id' => $product->id,
                             'attribute_id' => $attribute,
@@ -83,8 +85,15 @@ class ProductController extends Controller
             if (!empty($request->get('addons'))){
                 foreach ($request->get('addons') as $aKey => $addon){
                     if ($addon != null){
+                        if (isset($request->get('addon_groups')[$aKey]) && !empty($request->get('addon_groups')[$aKey])){
+                            $addonGroupId = $request->get('addon_groups')[$aKey];
+                        }else{
+                            $addonItem = AddonItem::find($addon);
+                            $addonGroupId = $addonItem->addon_group_id;
+                        }
                         ProductAddon::create([
                             'product_id' => $product->id,
+                            'addon_group_id' => $addonGroupId ?? null,
                             'addon_item_id' => $addon,
                             'price' => $request->get('addon_prices')[$aKey] ?? 0,
                             'discounted_price' => 0.00,
@@ -105,8 +114,8 @@ class ProductController extends Controller
         $categories = Category::get();
         $addonItems = AddonItem::get();
         $attributes = Attribute::get();
-        $productSizes = $this->itemSizes();
-        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes','productSizes'));
+        $sizes = $this->getSizes();
+        return view('admin.product.add-product', compact('categories', 'addonItems', 'attributes', 'sizes'));
     }
 
 
@@ -125,6 +134,7 @@ class ProductController extends Controller
             $content->name = $request->input('name');
             $content->description = $request->input('description');
             $content->price = $request->input('price');
+            $content->type = $request->input('type');
             if ($request->has('file')){
                 $fileName = time() . '-' . $request->file('file')->getClientOriginalName();
                 $filePath = $request->file('file')->path();
@@ -136,16 +146,18 @@ class ProductController extends Controller
             ProductSize::where('product_id', $id)->delete();
             if (!empty($request->get('sizes'))){
                 foreach ($request->get('sizes') as $sKey => $size){
-                    ProductSize::create([
-                        'product_id' => $id,
-                        'size' => $size,
-                        'price' => $request->get('size_prices')[$sKey] ?? 0,
-                        'discounted_price' => 0.00,
-                    ]);
+                    if ($size != null){
+                        ProductSize::create([
+                            'product_id' => $id,
+                            'size' => $size,
+                            'price' => $request->get('size_prices')[$sKey] ?? 0,
+                            'discounted_price' => 0.00,
+                        ]);
+                    }
                 }
             }
             ProductAttribute::where('product_id', $id)->delete();
-            if (!empty($request->get('attributes'))){
+            if (!empty($request->get('attributes')) && !empty($request->get('attribute_items'))){
                 foreach ($request->get('attributes') as $aKey => $attribute){
                     if ($attribute != null){
                         ProductAttribute::create([
@@ -159,12 +171,21 @@ class ProductController extends Controller
             ProductAddon::where('product_id', $id)->delete();
             if (!empty($request->get('addons'))){
                 foreach ($request->get('addons') as $aKey => $addon){
-                    ProductAddon::create([
-                        'product_id' => $id,
-                        'addon_item_id' => $addon,
-                        'price' => $request->get('addon_prices')[$aKey] ?? 0,
-                        'discounted_price' => 0.00,
-                    ]);
+                    if ($addon != null){
+                        if (isset($request->get('addon_groups')[$aKey]) && !empty($request->get('addon_groups')[$aKey])){
+                            $addonGroupId = $request->get('addon_groups')[$aKey];
+                        }else{
+                            $addonItem = AddonItem::find($addon);
+                            $addonGroupId = $addonItem->addon_group_id;
+                        }
+                        ProductAddon::create([
+                            'product_id' => $id,
+                            'addon_group_id' => $addonGroupId ?? null,
+                            'addon_item_id' => $addon,
+                            'price' => $request->get('addon_prices')[$aKey] ?? 0,
+                            'discounted_price' => 0.00,
+                        ]);
+                    }
                 }
             }
             return redirect()->back()->with('success', 'Product Updated successfully');
@@ -172,9 +193,12 @@ class ProductController extends Controller
 
         $categories = Category::get();
         $addonItems = AddonItem::get();
+        $addonGroups = AddonGroup::with('addonItems')->whereHas('addonItems', function ($q){
+            $q->where('id', '!=', null);
+        })->where('category_id', $content->category_id)->get();
         $attributes = Attribute::with('attributeItems')->get();
-        $productSizes = $this->itemSizes();
-        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'attributes', 'productSizes'));
+        $sizes = $this->getSizes();
+        return view('admin.product.update-product', compact('content','categories', 'addonItems', 'addonGroups', 'attributes', 'sizes'));
     }
 
     public function destroy($id)

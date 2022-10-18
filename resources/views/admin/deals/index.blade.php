@@ -47,7 +47,7 @@
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
-                                        <th>Action</th>
+                                        <th width="100px">Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>

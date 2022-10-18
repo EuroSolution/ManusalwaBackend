@@ -34,7 +34,7 @@ class AddonGroupController extends Controller
             AddonGroup::create([
                 'name' => $request->input('name'),
                 'category_id' => $request->input('category'),
-                'type' => $request->input('type')
+                'type' => $request->input('type') ?? 'Addon'
             ]);
             return redirect()->back()->with('success', 'Addon Group Added Successfully');
         }

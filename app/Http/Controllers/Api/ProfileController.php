@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\Deal;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -43,8 +44,8 @@ class ProfileController extends Controller
 
     public function vouchers(Request $request){
         $vouchers = Coupon::whereHas('couponUsers', function ($q){
-            $q->where('user_id', Auth::id());
-        })->get();
+            $q->where('user_id', Auth::id())->where('availed', 0);
+        })->where('expiration_date', '<=', date('Y-m-d'))->get();
 
         return $this->success($vouchers);
     }
@@ -71,10 +72,55 @@ class ProfileController extends Controller
 
     public function getOrderById($id){
         $order = Order::with('orderItems', 'orderItems.product','orderItems.orderItemAddons', 'orderItems.orderItemAttributes')
-            ->where('id', $id)->get();
+            ->where('id', $id)->first();
         if ($order != null){
-            return $this->success($order);
+            $dealsArray = array();
+            $dealItemsArray = array();
+            $normalItems = array();
+            $orderDetail = array(
+                'order_no' => $order->order_number,
+                'subtotal' => $order->subtotal,
+                'tax' => $order->tax,
+                'delivery_fee' => $order->delivery_fee,
+                'discount' => $order->discount,
+                'total_amount' => $order->total_amount,
+                'address' => $order->address,
+                'order_type' => $order->order_type,
+                'notes' => $order->notes,
+            );
+            $dealId = "--";
+            foreach($order->orderItems as $item){
+                if ($item->deal_id != null){
+                    if ($dealId != $item->deal_id){
+                        $dealId = $item->deal_id;
+                      	$deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
+                            ->where('id',$item->deal_id)->first();
+                        $dealsArray = array(
+                        	'id' => $deal->id,
+                          	'name' => $deal->name,
+                          	'description' => $deal->description,
+                          	'price' => $deal->price,
+                          	'image' => $deal->image
+                        );
+                        $dealItemsArray[] = $item;
+                    }else{
+                        $dealItemsArray[] = $item;
+                    }
+                }else{
+                    $normalItems[] = $item;
+                }
+            }
+            if (!empty($dealItemsArray)){
+                $dealsArray['dealItems'] = (array) $dealItemsArray;
+                $orderDetail['orderItems']['deals'][] = (array) $dealsArray;
+            }else{
+                $orderDetail['orderItems']['deals'] = array();
+            }
+
+            $orderDetail['orderItems']['normalItems'] = $normalItems;
+            return $this->success($orderDetail);
+        }else{
+            return $this->error('Order Not Found');
         }
-        return $this->error("Order Not Found");
     }
 }

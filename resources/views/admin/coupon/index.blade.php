@@ -51,6 +51,7 @@
                                 <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                     <tr style="text-align: center">
+                                        <th>ID</th>
                                         <th>Coupon Code</th>
                                         <th>Value</th>
                                         <th>Expiration Date</th>
@@ -114,7 +115,7 @@
                     extend: "print",
                     className: "btn-sm"
                 }],
-                order: [[1, 'asc']],
+                order: [[0, 'desc']],
                 responsive: true,
                 processing: true,
                 serverSide: true,
@@ -123,6 +124,7 @@
                     url: `{{route('admin.coupons')}}`,
                 },
                 columns: [
+                    {data: 'id', name: 'id'},
                     {data: 'code', name: 'code'},
                     {data: 'value', name: 'value'},
                     {data: 'expiration_date', name: 'expiration_date'},

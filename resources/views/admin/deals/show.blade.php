@@ -98,16 +98,16 @@
                             <table id="example1" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
                                         <th>Category</th>
+                                        <th>Size</th>
                                         <th>Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($deal->dealItems as $product)
                                         <tr>
-                                            <td>{{$product->product_name}}</td>
                                             <td>{{$product->category_name}}</td>
+                                            <td>{{$product->size}}</td>
                                             <td>{{$product->quantity}}</td>
                                         </tr>
                                     @endforeach

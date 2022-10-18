@@ -20,6 +20,7 @@ class AuthController extends Controller
         if ($validator->fails()){
             return $this->error('Validation Error', 200, [], $validator->errors());
         }
+
         if (env('APP_ENV') != 'production'){
             $request->phone = str_replace('+49', '+', $request->phone);
         }
@@ -36,7 +37,7 @@ class AuthController extends Controller
                 return $this->error("Invalid Password");
             }
         }else{
-            return $this->error("Invalid Credentials");
+            return $this->error("Your Account is not exists. Please Signup");
         }
 
         $user->api_token =  auth()->user()->createToken('API Token')->plainTextToken;
@@ -46,43 +47,65 @@ class AuthController extends Controller
 
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email', //|unique:users
-            'phone' => 'required|unique:users',
+            'email' => 'required|email',
+            'phone' => 'required',
             'password' => 'required|min:8',
         ]);
         if ($validator->fails()){
             return $this->error('Validation Error', 200, [], $validator->errors());
         }
+        $otpToken = rand(10000, 99999);
+        /*$user = User::withTrashed()->where('email', $request->email)->first();
+        if ($user != null && ($user->deleted_at != null || $user->status != 0)){
+            return $this->error('Validation Error', 200, [], ['email' => 'email already exists']);
+        }*/
+
         if (env('APP_ENV') != 'production'){
             $request->phone = str_replace('+49', '+', $request->phone);
         }
-        $otpToken = rand(10000, 99999);
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => Hash::make($request->password),
-            "phone" => $request->phone,
-            "otp" => $otpToken,
-            "fcm_token" => $request->fcm_token ?? null
-        ]);
+
+        $user = User::withTrashed()->where('phone', $request->phone)->first();
+        if ($user != null && $user->deleted_at == null){
+            return $this->error('Validation Error', 200, array('login' => true), array('phone' => ['Phone already exists. Please Login']));
+        }
+        if ($user != null){
+            $user->restore();
+            $user->deleted_at = null;
+            $user->password = Hash::make($request->password);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->otp = $otpToken;
+            $user->save();
+        }else{
+            $user = User::create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "password" => Hash::make($request->password),
+                "phone" => $request->phone,
+                "otp" => $otpToken,
+                "fcm_token" => $request->fcm_token ?? null
+            ]);
+        }
 
         $token = $user->createToken('API Token')->plainTextToken;
         $user->api_token = $token;
         $user->save();
-        try{
-            $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
-            $this->sendMessageToClient($request->phone, $messageBody);
-            //return $this->error($msg);
-            $mailData = array(
-                'to' => $user->email,
-                'text' => $messageBody
-            );
-            Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
-                $message->to($mailData['to'])->subject("Registration Token");
-            });
+        $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
+        $smsStatus = $this->sendMessageToClient($request->phone, $messageBody);
 
-        }catch (\Exception $ex){
-            $this->error($ex->getMessage());
+        if ($smsStatus['success'] == false){
+            try{
+                $mailData = array(
+                    'to' => $user->email,
+                    'text' => $messageBody
+                );
+                Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
+                    $message->to($mailData['to'])->subject("Registration Token");
+                });
+
+            }catch (\Exception $ex){
+                $this->error('Sms and Email Services are not working.');
+            }
         }
 
         return $this->success(array("otp" => $otpToken, "api_token" => $token));
@@ -101,6 +124,7 @@ class AuthController extends Controller
             if (env('APP_ENV') != 'production'){
                 $request->phone = str_replace('+49', '+', $request->phone);
             }
+
             $user = User::where('phone', $request->phone)->first();
         }
         if ($user != null){
@@ -109,23 +133,27 @@ class AuthController extends Controller
             $token = $user->createToken('API Token')->plainTextToken;
             $user->api_token = $token;
             $user->save();
+            $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
+            $smsStatus = $this->sendMessageToClient($request->phone, $messageBody);
 
-            try{
-                $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
-                $this->sendMessageToClient($user->phone, $messageBody);
-                $mailData = array(
-                    'to' => $user->email,
-                    'text' => $messageBody
-                );
-                Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
-                    $message->to($mailData['to'])->subject("OTP Token");
-                });
-                return $this->success(array("otp" => $otpToken, "api_token" => $token));
-            }catch (\Exception $ex){
-                return $this->error($ex->getMessage());
+            if ($smsStatus['success'] == false){
+                try{
+                    $mailData = array(
+                        'to' => $user->email,
+                        'text' => $messageBody
+                    );
+                    Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
+                        $message->to($mailData['to'])->subject("OTP Token");
+                    });
+                    return $this->success(array("otp" => $otpToken, "api_token" => $token));
+
+                }catch (\Exception $ex){
+                    $this->error('Sms and Email Services are not working.');
+                }
             }
+            return $this->success(array("otp" => $otpToken, "api_token" => $token));
         }
-        return $this->error('Invalid phone number', 200, ['phone' => 'Phone number is not registered']);
+        return $this->error('Invalid phone number', 200, array('phone' => ['Phone number is not registered']));
     }
 
     public function verifyToken(Request $request)
@@ -192,20 +220,24 @@ class AuthController extends Controller
             $user->save();
 
             $data = array('otp' => $user->otp, 'api_token' => $user->api_token);
-            try{
-                $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
-                $this->sendMessageToClient($user->phone, $messageBody);
-                $mailData = array(
-                    'to' => $user->email,
-                    'text' => $messageBody
-                );
-                Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
-                    $message->to($mailData['to'])->subject("OTP Token");
-                });
-                return $this->success($data);
-            }catch (\Exception $ex){
-                return $this->error($ex->getMessage());
+            $messageBody = env('APP_NAME')."\nOTP token is:$otpToken";
+            $smsStatus = $this->sendMessageToClient($request->phone, $messageBody);
+
+            if ($smsStatus['success'] == false){
+                try{
+                    $mailData = array(
+                        'to' => $user->email,
+                        'text' => $messageBody
+                    );
+                    Mail::send('emails.send-otp', $mailData, function ($message) use($mailData){
+                        $message->to($mailData['to'])->subject("OTP Token");
+                    });
+
+                }catch (\Exception $ex){
+                    $this->error('Sms and Email Services are not working.');
+                }
             }
+            return $this->success($data);
         }else{
             return $this->error('Your Phone is not registered. Please Signup', 200);
         }

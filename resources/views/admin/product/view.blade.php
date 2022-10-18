@@ -55,6 +55,10 @@
                                         <td>{{$product->name??''}}</td>
                                     </tr>
                                     <tr>
+                                        <th>Type</th>
+                                        <td>{{$product->type??''}}</td>
+                                    </tr>
+                                    <tr>
                                         <th>Description</th>
                                         <td>{{$product->description??''}}</td>
                                     </tr>

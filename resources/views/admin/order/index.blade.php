@@ -112,6 +112,7 @@
                                         <th>Total</th>
                                         <th>Coupon</th>
                                         <th>Status</th>
+                                        <th>Change Status</th>
                                         <th>Order Date</th>
                                         <th>Action</th>
                                     </tr>
@@ -189,6 +190,7 @@
                     {data: 'total_amount', name: 'total_amount'},
                     {data: 'coupon', name: 'coupon'},
                     {data: 'status', name: 'status'},
+                    {data: 'change_status', name: 'change_status', orderable: false},
                     {data: 'order_date', name: 'order_date'},
                     {data: 'action', name: 'action', orderable: false}
                 ]
@@ -221,6 +223,30 @@
                             toastr.error('Something Went Wrong..!!');
                         }else{
                             toastr.success('Record Delete Successfully');
+                        }
+                    }
+                })
+            });
+
+            $(document).on('change','#order_status',function(){
+            let id = $(this).data('order_id');
+            let val = $(this).val();
+
+            $.ajax({
+                    type:"post",
+                    url: "{{url('order/changeOrderStatus')}}/"+id,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data:{
+                        val:val
+                    },
+                    success: function (data) {
+                        if(data === false) {
+                            toastr.error('Something Went Wrong..!!');
+                        }else{
+                            toastr.success('Record Status Updated Successfully');
+                            DataTable.ajax.reload();
                         }
                     }
                 })

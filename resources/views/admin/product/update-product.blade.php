@@ -71,7 +71,20 @@
                                                 @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
-                                        </span>
+                                            </span>
+                                                @enderror
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="type">Type</label>
+                                                <select class="form-control @error('type') is-invalid @enderror" name="type">
+                                                    <option value="">Select</option>
+                                                    <option {{(old('type')=='Regular' || $content->type == 'Regular')?'selected':''}} value="Regular">Regular</option>
+                                                    <option {{(old('type')=='Addon' || $content->type == 'Addon')?'selected':''}} value="Addon">Addon</option>
+                                                </select>
+                                                @error('type')
+                                                <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                            </span>
                                                 @enderror
                                             </div>
                                             <div class="form-group">
@@ -101,7 +114,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -111,7 +124,7 @@
                                     <div role="tabpanel" class="tab-pane fade in" id="sizes">
                                         <div class="card-body">
                                             <div class="col-md-12 text-right">
-                                                <input type="button" class="btn btn-primary btn-sm" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
+                                                <input type="button" class="btn btn-primary btn-sm addMoreSizes" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
                                             </div>
                                             <table class="table table-bordered">
                                                 <thead>
@@ -128,9 +141,9 @@
                                                         @php $sizeCount++; @endphp
                                                         <tr id="row_size_{{$sKey}}" class="row_prod_size">
                                                             <td>
-                                                                <select class="form-control" name="sizes[{{$sKey}}]" id="">
-                                                                    @foreach ($productSizes as $productSize)
-                                                                        <option {{($productSize == $size->size)?'selected':''}} value="{{$productSize}}">{{$productSize}}</option>
+                                                                <select class="form-control" name="sizes[{{$sKey}}]">
+                                                                    @foreach($sizes as $sizeKey => $sizeVal)
+                                                                        <option value="{{$sizeVal}}" @if($sizeVal == $size->size) selected @endif>{{$sizeVal}}</option>
                                                                     @endforeach
                                                                 </select>
                                                             </td>
@@ -151,9 +164,9 @@
                                             <table class="table table-bordered">
                                                 <thead>
                                                 <tr>
-                                                    <th>Attribute</th>
-                                                    <th>Attribute Item</th>
-                                                    <th>Action</th>
+                                                    <th width="40%">Attribute</th>
+                                                    <th width="40%">Attribute Item</th>
+                                                    <th width="10%">Action</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="add_more_attributes">
@@ -175,7 +188,7 @@
                                                                         @endforeach
                                                                     @endforeach
                                                                 </select></td>
-                                                            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeAttributesRow({{$atKey}})"></td>
+                                                            <td><input type="button" class="btn btn-danger btn-md" value="-" id="addMoreAttribute"></td>
                                                         </tr>
                                                     @endforeach
                                                 @endif
@@ -186,14 +199,15 @@
                                     <div role="tabpanel" class="tab-pane fade in" id="addons">
                                         <div class="card-body">
                                             <div class="col-md-12 text-right">
-                                                <input type="button" class="btn btn-primary btn-sm" value="Add Addon" onclick="addMoreAddon()" style="margin-bottom: 10px;"/>
+                                                <input type="button" class="btn btn-primary btn-sm" value="Add Addon" id="addMoreAddon" style="margin-bottom: 10px;"/>
                                             </div>
                                             <table class="table table-bordered">
                                                 <thead>
                                                 <tr>
-                                                    <th>Addon</th>
-                                                    <th>Price</th>
-                                                    <th>Action</th>
+                                                    <th width="35%">Addon Group</th>
+                                                    <th width="35%">Addon Item</th>
+                                                    <th width="20%">Price</th>
+                                                    <th width="10%">Action</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody id="add_more_addons">
@@ -202,6 +216,13 @@
                                                     @foreach($content->addons as $aKey => $addon)
                                                         @php $addonCount++; @endphp
                                                         <tr id="row_addon_{{$aKey}}" class="row_prod_addon">
+                                                            <td><select class="form-control" name="addon_groups[{{$aKey}}]">
+                                                                    <option value="">Select</option>
+                                                                    @foreach($addonGroups as $addonGroup)
+                                                                        <option value="{{$addonGroup->id}}" @if($addonGroup->id == $addon->addon_group_id) selected @endif>{{$addonGroup->name}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><select class="form-control" name="addons[{{$aKey}}]">
                                                                     <option value="">Select</option>
                                                                     @foreach($addonItems as $addonItem)
@@ -222,7 +243,7 @@
 
 
                                 <div class="card-footer text-center">
-                                    <button type="submit" class="btn btn-primary btn-md">Submit</button>
+                                    <button type="submit" class="btn btn-primary btn-md" id="submit">Submit</button>
                                     <a href="{{route('admin.products')}}" class="btn btn-warning btn-md">Cancel</a>
                                 </div>
                             </form>
@@ -236,54 +257,52 @@
 @endsection
 @section('script')
     <script>
-        
+        var addons = "";
+        var attributes = "";
+
+        getAddonsAndAttribs({{$content->category_id}});
+
         var counter = {{$sizeCount??1}};
-        $(document).ready(function(){
-            // alert(counter);
-            
-        });
-        var productSizes = {!! json_encode($productSizes) !!}
-        
-        var sizes = '<option value="">Select</option>';
-        for(a = 0; a<productSizes.length; a++){
-            sizes += "<option value'"+productSizes[a]+"'>"+productSizes[a]+"</option>";
+
+        if (counter == 3){
+            $(".addMoreSizes").attr('disabled', 'disabled');
         }
         function addMoreSizes(){
-            
-            if(!(counter <= 3)){
-                alert('can not add more than four sizes');
-                return false;
-            }
-            $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-                <td>
-                <select class="form-control" name="sizes[]">
-                    ${sizes}
-                </select>
-                </td>
-                <td><input type="text" class="form-control" name="size_prices[]" placeholder="Price"></td>
-                <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-            </tr>`);;
+            console.log(counter);
+            let html = '<tr id="row_size_'+counter+'" class="row_prod_size">'
+                +'<td><select class="form-control" name="sizes[]" >';
+            @foreach($sizes as $sizeKey => $size)
+                html += '<option value="{{$size}}">{{$size}}</option>'
+            @endforeach
+                html += '</select></td>'
+                +'<td><input type="text" class="form-control numberField" name="size_prices[]" placeholder="Price"></td>'
+                +'<td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow('+counter+')"></td></tr>';
+            $("#add_more_sizes").append(html);
+            counter++;
 
-            counter++
+            if (counter >= 4){
+                $(".addMoreSizes").attr('disabled', 'disabled');
+            }
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
-            --counter;
+            counter--;
+            if (counter <= 4){
+                $(".addMoreSizes").attr('disabled', false);
+            }
         }
+
         var counter2 = {{$addonCount??1}};
-        function addMoreAddon(){
+        function addMoreAddon(addons){
             $("#add_more_addons").append(`<tr id="row_addon_${counter2}" class="row_prod_addon">
-                <td><select class="form-control" name="addons[]">
-                    <option value="">Select</option>
-                    @foreach($addonItems as $addon)
-            <option value="{{$addon->id}}">{{$addon->name}}</option>
-                    @endforeach
-            </select></td>
-            <td><input type="text" class="form-control" name="addon_prices[]" placeholder="Price"></td>
+            <td><select id="addon_id_${counter2}" class="form-control" name="addon_groups[]" onchange="getAddonItems(${counter2}, this.value)">${addons}</select></td>
+            <td><select id="addon_item_id_${counter2}" class="form-control" name="addons[]"></select></td>
+            <td><input type="text" class="form-control numberField" name="addon_prices[]" placeholder="Price"></td>
             <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeAddonRow(${counter2})"></td>
             </tr>`);
             counter2++;
         }
+
         var counter3 = {{$attrCount??1}};
         function addMoreAttributes(){
             $("#add_more_attributes").append(`<tr id="row_attr_${counter3}" class="row_prod_attr">
@@ -322,6 +341,33 @@
         function removeAttributesRow(index){
             $('#row_attr_'+index).remove();
         }
+
+        $("#addMoreAddon").on('click', function (){
+            addMoreAddon(addons);
+        });
+        $("#addMoreAttribute").on('click', function (){
+            addMoreAttributes(attributes);
+        });
+
+        function getAddonItems(counter,val) {
+            var addon_id = val;
+            if(addon_id !== ''){
+                $.ajax({
+                    url:"{{ route('admin.getAddonItemsById') }}",
+                    type:"get",
+                    data: {
+                        addon_id: addon_id
+                    },
+                    success:function (data) {
+                        $('#addon_item_id_'+counter).empty();
+                        $.each(data ,function(index,val){
+                            $('#addon_item_id_'+counter).append('<option value="'+val.id+'">'+val.name+'</option>');
+                        })
+                    }
+                })
+            }
+        }
+
         $(document).ready(function() {
             $(".numberField").click(function() {
                 var $input = $(this);
@@ -345,11 +391,68 @@
             });
         });
 
+        $("#category").on('change', function (){
+            let categoryId = $(this).val();
+            getAddonsAndAttribs(categoryId);
+        });
+
+        function getAddonsAndAttribs(categoryId){
+            $.ajax({
+                type: "GET",
+                url: "{{route('admin.getAddonsAttributesByCategoryId', '')}}/"+categoryId,
+                success:function (data){
+                    console.log(data);
+                    var addonHtml = '<option value="">Select</option>';
+                    var attrItemsHtml = '<option value="">Select</option>';
+                    if(data.addons.length > 0) {
+                        $.each(data.addons, function (i, o) {
+                            addonHtml += '<option value="' + o.id + '">' + o.name + '</option>';
+                        })
+                    }
+                    if(data.attributes.length > 0) {
+                        $.each(data.attributes, function (i, o) {
+                            attrItemsHtml += '<option value="' + o.id + '">' + o.name + '</option>';
+                        })
+                    }
+                    addons = addonHtml;
+                    attributes = attrItemsHtml;
+                }
+            });
+        }
+
+
         $('#productImage').on('change', function(){
             const [file] = productImage.files
             if (file) {
-                img0.src = URL.createObjectURL(file)
+                img_0.src = URL.createObjectURL(file)
             }
         });
+
+        $('#add_more_sizes, #add_more_addons').click(function(){
+            $(this).find('.numberField').click(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
+
+            $(this).find('.numberField').focusout(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
+        });
+        
+
+            
     </script>
 @endsection

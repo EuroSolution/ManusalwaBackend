@@ -76,14 +76,14 @@
                                                         <label for="exampleInputFile">Image</label>
                                                         <div class="input-group">
                                                             <div class="custom-file">
-                                                                <input type="file" class="custom-file-input" name="file" id="dealImage">
-                                                                <label class="custom-file-label" for="dealImage">Choose file</label>
+                                                                <input type="file" class="custom-file-input" name="file" id="addonItemImage">
+                                                                <label class="custom-file-label" for="addonItemImage">Choose file</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3" >
-                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                                    <img src="{{$content->image ?? asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
                                                 </div>
 
                                             </div>
@@ -92,7 +92,7 @@
                                     <div role="tabpanel" class="tab-pane" id="sizes">
                                         <div class="card-body">
                                             <div class="col-md-12 text-right">
-                                                <input type="button" class="btn btn-primary btn-sm" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
+                                                <input type="button" class="btn btn-primary btn-sm addMoreSizes" value="Add Size" onclick="addMoreSizes()" style="margin-bottom: 10px;"/>
                                             </div>
                                             <table class="table table-bordered">
                                                 <thead>
@@ -125,42 +125,59 @@
 @endsection
 @section('script')
     <script>
-        
         var counter = 1;
-
-        var addonSizes = {!! json_encode($addonSizes) !!}
-        
-        var sizes = '<option value="">Select</option>';
-        for(a = 0; a<addonSizes.length; a++){
-            sizes += "<option value'"+addonSizes[a]+"'>"+addonSizes[a]+"</option>";
-        }
-
         function addMoreSizes(){
-            if(counter >= 5){
-                alert('can not add more than four sizes');
-                return false;
-            }
             $("#add_more_sizes").append(`<tr id="row_size_${counter}" class="row_prod_size">
-        <td>
-            <select class="form-control" name="sizes[]">
-                ${sizes}
-            </select>
-        </td>
-        <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
-        <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
-        </tr>`);
+             <td><select class="form-control" name="sizes[]">
+                        @foreach($sizes as $sizeKey => $sizeVal)
+                <option value="{{$sizeVal}}">{{$sizeVal}}</option>
+                        @endforeach
+                </select></td>
+            <td><input type="text" class="form-control numberField" name="prices[]" placeholder="Price"></td>
+            <td><input type="button" class="btn btn-danger btn-md" value="-" onclick="removeSizeRow(${counter})"></td>
+            </tr>`);
             counter++;
+            if (counter > 4){
+                $(".addMoreSizes").attr('disabled', 'disabled');
+            }
         }
         function removeSizeRow(index){
             $('#row_size_'+index).remove();
             counter--;
+            if (counter <= 4){
+                $(".addMoreSizes").attr('disabled', false);
+            }
         }
 
-        $('#dealImage').on('change', function(){
-            const [file] = dealImage.files
+        $('#addonItemImage').on('change', function(){
+            const [file] = addonItemImage.files
             if (file) {
-                img0.src = URL.createObjectURL(file)
+                img_0.src = URL.createObjectURL(file)
             }
+        });
+
+        $('#add_more_sizes').click(function(){
+            $(this).find('.numberField').click(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
+
+            $(this).find('.numberField').focusout(function(){
+                var $input = $(this);
+                var $inputVal = ($input.val() === '') ? 0 : $input.val();
+                var count = parseFloat($inputVal);
+                if (count < 0 || isNaN(count)) {
+                    count = 1;
+                }
+                $input.val(count);
+                return false;
+            });
         });
     </script>
 @endsection

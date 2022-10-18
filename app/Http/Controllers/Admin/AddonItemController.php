@@ -63,12 +63,11 @@ class AddonItemController extends Controller
                 $imageUrl = $this->uploadImageIK($fileName, $filePath, 'products');
                 $item->update(['image' => $imageUrl]);
             }
-            return redirect()->back()->with('success', 'Addon Item Added Successfully');
+            return redirect(route('admin.addonItems'))->with('success', 'Addon Item Added Successfully');
         }
         $addonGroups = AddonGroup::get();
-        $sizes = array('small', 'medium', 'large');
-        $addonSizes = $this->itemSizes();
-        return view('admin.addon-item.create', compact('addonGroups', 'sizes', 'addonSizes'));
+        $sizes = $this->getSizes();
+        return view('admin.addon-item.create', compact('addonGroups', 'sizes'));
     }
 
     public function edit(Request $request, $id){
@@ -108,8 +107,7 @@ class AddonItemController extends Controller
             return redirect()->back()->with('success', 'Addon Item Updated Successfully');
         }
         $addonGroups = AddonGroup::get();
-        // $sizes = array('small', 'medium', 'large');
-        $sizes = $this->itemSizes();
+        $sizes = $this->getSizes();
         return view('admin.addon-item.edit', compact('content', 'addonGroups', 'sizes'));
     }
 

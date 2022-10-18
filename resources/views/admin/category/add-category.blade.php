@@ -41,7 +41,7 @@
                                         <select class="form-control @if(Session::has('err')) is-invalid @endif" name="main-category" id="main-category">
                                             <option value="0">Select Category</option>
                                             @foreach($mainCategories as $category)
-                                                <option {{(!empty($content->parent_id)&&$content->parent_id==$category->id)||old('main-category')==$category->id?'selected':''}} value="{{$category->id}}">{{$category->name ?? ''}}</option>
+                                                <option {{(isset($content->parent_id) && $content->parent_id==$category->id)||old('main-category')==$category->id?'selected':''}} value="{{$category->id}}">{{$category->name ?? ''}}</option>
                                             @endforeach
                                         </select>
                                         @if(Session::has('err'))
@@ -74,7 +74,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-3" >
-                                            <img src="{{isset($content->image) ? $content->image : asset('admin/dist/img/placeholder.png')}}" alt="" id="img0" style="height: 150px;width: 150px;">
+                                            <img src="{{isset($content->image) ? $content->image : asset('admin/dist/img/placeholder.png')}}" alt="" id="img_0" style="height: 150px;width: 150px;">
                                         </div>
 
                                     </div>
@@ -95,15 +95,16 @@
         </section>
     </div>
     @endsection
-    @section('script')
+       @section('script')
     
         <script>
-            categoryImage.onchange = evt => {
+            $('#categoryImage').on('change', function(){
                 const [file] = categoryImage.files
                 if (file) {
-                    img0.src = URL.createObjectURL(file)
+                    img_0.src = URL.createObjectURL(file)
                 }
-            }
+            });
         </script>
     
     @endsection
+

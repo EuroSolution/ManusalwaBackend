@@ -33,12 +33,13 @@ class CartController extends Controller
                     'cart_count' => $request->cart_count,
                     'subtotal' => $request->subtotal,
                     'tax' => $request->tax,
-                    'discount' => $request->discount,
+                    'discount' => $request->discount ?? 0,
                     'delivery_fee' => $request->delivery_fee,
                     'is_deal' => $request->is_deal ?? 0,
-                    'voucher_code' => $request->voucher_code,
+                    'voucher_code' => $request->voucher_code ?? null,
                     'total_amount' => $request->total_amount,
-                    'notes' => $request->notes
+                    'notes' => $request->notes,
+                    'source' => $request->source ?? null
                 ]);
                 if (!empty($request->cart_items)) {
                     foreach ($request->cart_items as $item) {
@@ -76,7 +77,7 @@ class CartController extends Controller
                                                 'addon_item_id' => $addon->id,
                                                 'addon_group' => $addon->addonGroup->name,
                                                 'addon_item' => $addon->name,
-                                                'price' => $addon->price,
+                                                'price' => $addonItem['price'] ?? 0,
                                                 'quantity' => $addonItem['quantity'] ?? 1,
                                                 'size' => $addonItem['size'] ?? ''
                                             ]);
@@ -103,7 +104,7 @@ class CartController extends Controller
                 if (!empty($request->deals)){
                     foreach($request->deals as $deal){
                         foreach ($deal['deal_items'] as $deal_item){
-                            $product = Product::with('addons')->find($deal_item['product_id']);
+                            $product = Product::with('addons')->find($deal_item['product_id'] ?? $deal_item['id']);
                             if ($product != null) {
                                 $cartItem = CartItem::create([
                                     'cart_id' => $cart->id,
@@ -116,14 +117,14 @@ class CartController extends Controller
                                 ]);
                                 if (isset($deal_item['deal_item_addons']) && !empty($deal_item['deal_item_addons'])) {
                                     foreach ($deal_item['deal_item_addons'] as $addonItem) {
-                                        $addon = AddonItem::with('addonGroup')->find($addonItem['addon_item_id']);
+                                        $addon = AddonItem::with('addonGroup')->find($addonItem['addon_item_id'] ?? $addonItem['id']);
                                         if ($addon != null) {
                                             CartItemAddon::create([
                                                 'cart_item_id' => $cartItem->id,
                                                 'addon_item_id' => $addon->id,
                                                 'addon_group' => $addon->addonGroup->name,
                                                 'addon_item' => $addon->name,
-                                                'price' => $addon->price,
+                                                'price' => $addonItem['price'] ?? 0,
                                                 'quantity' => $addonItem['quantity'] ?? 1,
                                                 'size' => $addonItem['size'] ?? ''
                                             ]);
@@ -132,7 +133,7 @@ class CartController extends Controller
                                 }
                                 if (isset($deal_item['attributes']) && !empty($deal_item['attributes'])) {
                                     foreach ($deal_item['attributes'] as $attribute) {
-                                        $attributeItem = AttributeItem::with('attribute')->find($attribute['attribute_item_id']);
+                                        $attributeItem = AttributeItem::with('attribute')->find($attribute['attribute_item_id']??$attribute['id']);
                                         if ($attributeItem != null) {
                                             CartAttribute::create([
                                                 'cart_item_id' => $cartItem->id,

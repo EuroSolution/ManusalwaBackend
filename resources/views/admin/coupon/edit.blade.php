@@ -129,7 +129,7 @@
                                     <div class="form-group">
                                         <label for="type">Type</label>
                                         <select class="form-control @error('type') is-invalid @enderror" name="type" id="type">
-                                            <option>Select</option>
+                                            <option value="">Select</option>
                                             <option value="value" @if($coupon->type == 'value') selected @endif>Value</option>
                                             <option value="percentage" @if($coupon->type == 'percentage') selected @endif>Percentage</option>
                                         </select>
@@ -139,15 +139,20 @@
                                             </span>
                                         @enderror
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="value">Customers</label>
-                                        <select class="customers form-control" id="customers" name="customers[]" multiple="multiple">
-                                            @foreach($customers as $customer)
-                                                <option value="{{$customer->id}}">{{$customer->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    {{-- @if (!$coupon->all_users)     --}}
+                                        <div class="form-group">
+                                            <label for="allUsers">For All Users</label>
+                                            &nbsp;&nbsp;&nbsp;<input type="checkbox" name="allUsers" id="all-users" @if ($coupon->all_users == 1) checked @endif>
+                                        </div>
+                                        <div class="form-group" id="customer-div">
+                                            <label for="value">Customers</label>
+                                            <select class="customers form-control" id="customers" name="customers[]" multiple="multiple">
+                                                @foreach($customers as $customer)
+                                                    <option value="{{$customer->id}}">{{$customer->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    {{-- @endif --}}
 
                                     <div class="form-group">
                                         <label for="value">Expiration Date</label>
@@ -157,10 +162,15 @@
                                             <label for="value">Minimum Order Amount</label>
                                             <input type="number" class="form-control" name="min_order" id="min_order" value="{{$coupon->min_order ?? old('min_order')}}" placeholder="Minimum Order Amount">
                                         </div>
-{{--                                    <div class="form-group">--}}
-{{--                                        <label for="value">Usage (How much time coupon can be use)</label>--}}
-{{--                                        <input type="number" class="form-control" name="usage" id="usage" value="{{$coupon->usage ?? old('usage')}}" placeholder="Usage">--}}
-{{--                                    </div>--}}
+                                        <div class="form-group">
+                                            <label for="value">Usage (How much time coupon can be use)</label>
+                                            <input type="number" class="form-control @error('usage') is-invalid @enderror " name="usage" id="usage" value="{{$couponUser->usage ?? old('usage')}}" placeholder="Usage">
+                                            @error('usage')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
 
                                     {{-- <div class="form-group">
                                         <label for="" class="mr-4">Status</label>
@@ -169,6 +179,7 @@
                                             <span class="slider round"></span>
                                         </label>
                                     </div> --}}
+
                                 </div>
                                 <!-- /.card-body -->
 
@@ -192,6 +203,18 @@
             $('.customers').select2();
             $('.customers').val([{{$userIds}}]);
             $('.customers').trigger('change');
+
+            if($('#all-users').is(':checked')){
+                $('#customer-div').hide();
+            }
+        });
+
+        $('#all-users').change(function(){
+            if(this.checked){
+                $('#customer-div').fadeOut(1800);
+            }else{
+                $('#customer-div').fadeIn(1800);
+            }
         });
     </script>
 @endsection

@@ -121,6 +121,8 @@ Route::middleware('admin')->name('admin.')->group(function (){
     Route::match(['get','post'], 'edit/delivery-time/{id}',[DeliveryTimesController::class, 'edit'])->name('editDeliveryTime');
     Route::delete('destroy/delivery-time/{id}',[DeliveryTimesController::class, 'destroy'])->name('destroyDeliveryTime');
 
+    Route::get('getAddonsAttributesByCategoryId/{id}', [CategoryController::class, 'getAddonsAttributesByCategoryId'])->name('getAddonsAttributesByCategoryId');
+
 });
 Route::patch('/fcm-token', [AdminController::class, 'updateToken'])->name('fcmToken');
 Route::get('/send-notification',[AdminController::class,'sendNotification']);

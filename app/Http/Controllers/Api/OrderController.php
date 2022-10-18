@@ -68,7 +68,7 @@ class OrderController extends Controller
     private function createOrder($request){
 
         $cart = Cart::with('cartItems', 'cartItems.cartItemAddons', 'cartItems.cartAttributes')
-            ->where('user_id', Auth::id())->first();
+            ->where('user_id', Auth::id())->orderBy('id', 'desc')->first();
         $discount = 0;
         $couponId = null;
         try {
@@ -108,6 +108,7 @@ class OrderController extends Controller
                     'order_status' => 'Pending',
                     'coupon_id' => $couponId ?? null,
                     'is_deal' => $cart->is_deal,
+                    'source' => $cart->source ?? null
 
                 ]);
                 foreach ($cart->cartItems as $cartItem){
@@ -157,7 +158,7 @@ class OrderController extends Controller
             });
             $response['status'] = true;
             $response['order_number'] = $order_no;
-            $response['total_amount'] = $orderDetail->total_amount;
+            $response['total_amount'] = number_format($orderDetail->total_amount, 2, '.', '');
             $response['voucher'] = ($orderDetail->discount > 0) ? $cart->voucher_code : "No Voucher";
             $response['approximate_time'] = "30 Minutes";
 
@@ -167,6 +168,8 @@ class OrderController extends Controller
             try{
                 $messageBody = "Thank you for your order. \nYour Order Number is $order_no \n\n ".env('APP_NAME');
                 $this->sendMessageToClient(Auth::user()->phone, $messageBody);
+                $this->sendPushNotification('Pizzeria Roma', 'Order placed', [], [Auth::id()]);
+                $this->sendPushNotification('New Order', 'Order No#'.$order_no, [], [1]);
             }catch (\Exception $exception){}
             return $response;
         }catch (\Exception $ex){

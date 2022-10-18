@@ -74,16 +74,24 @@
 {{--                                                @endif--}}
 {{--                                            </td>--}}
 {{--                                        </tr>--}}
-                                    @if(isset($coupon->couponUsers) && $coupon->couponUsers != null)
-                                        @foreach($coupon->couponUsers as $cu)
-                                            <tr>
-                                                <th>Customer Name</th>
-                                                <td>{{$cu->user->name ?? ''}}</td>
-                                                <th>Avail Status</th>
-                                                <td>{{(isset($cu->availed) && $cu->availed == 1) ? 'Availed' : 'Not Availed'}}</td>
-                                            </tr>
-                                        @endforeach
+                                    @if ($coupon->all_users)
+                                        <tr>
+                                            <th>For All Users</th>
+                                            <td colspan="3">Yes</td>
+                                        </tr>
+                                    @else
+                                        @if(isset($coupon->couponUsers) && $coupon->couponUsers != null)
+                                            @foreach($coupon->couponUsers as $cu)
+                                                <tr>
+                                                    <th>Customer Name</th>
+                                                    <td>{{$cu->user->name ?? ''}}</td>
+                                                    <th>Avail Status</th>
+                                                    <td>{{(isset($cu->availed) && $cu->availed == 1) ? 'Availed' : 'Not Availed'}}</td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
                                     @endif
+                                    
                                     </thead>
                                 </table>
                             </div>

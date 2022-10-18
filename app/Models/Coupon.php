@@ -10,11 +10,16 @@ class Coupon extends Model
     protected $table = "coupons";
 
     protected $fillable = [
-        'user_id', 'code', 'value', 'type', 'expiration_date', 'status', 'min_order'
+        'user_id', 'code', 'value', 'type', 'expiration_date', 'status', 'min_order','all_users'
     ];
 
     public function couponUsers(){
         return $this->hasMany(CouponUser::class, 'coupon_id', 'id');
+    }
+
+    public function couponUser(){
+        return $this->hasMany(CouponUser::class, 'coupon_id', 'id')
+            ->where('user_id', Auth::id());
     }
 
     public static function validateCoupon($couponCode, $orderAmt){
@@ -24,21 +29,24 @@ class Coupon extends Model
         $discount = 0;
 
         if ($couponCode != null || $couponCode != ''){
-            $coupon = Coupon::with('couponUsers')
-                ->whereHas('couponUsers', function ($q){
-                    $q->where('user_id', Auth::id())->where('availed', 0);
+            $coupon = Coupon::with('couponUser')
+                ->whereHas('couponUser', function ($q){
+                    $q->where('user_id', Auth::id());//->where('availed', 0);
                 })->where('code', $couponCode)->whereStatus(1)->first();
 
             if ($coupon != null){
                 if($coupon->expiration_date != null && $coupon->expiration_date <= date('Y-m-d')){
                     $couponError = true;
                     $couponErrorMsg = "Voucher has been Expired.";
-                }elseif ($coupon->min_order > $orderAmt){
+                }
+                if ($coupon->min_order > $orderAmt){
                     $couponError = true;
                     $couponErrorMsg = "Minimum order amount must be ".$coupon->min_order;
-                }elseif ($coupon->couponUsers[0]->availed > 0){
+                }
+                if ($coupon->couponUser[0]->used >= $coupon->couponUser[0]->usage){
                     $couponError = true;
-                    $couponErrorMsg = "Voucher limit has reached.";
+                    //$couponErrorMsg = "Voucher limit has reached.";
+                    $couponErrorMsg = "Invalid Voucher";
                 }
             }else{
                 $couponError = true;
@@ -66,8 +74,12 @@ class Coupon extends Model
     public static function availedVoucher($couponId){
         $data = CouponUser::where('coupon_id', $couponId)->where('user_id', Auth::id())->first();
         if ($data != null){
-            $data->availed = 1;
+            $data->used = $data->used+1;
             $data->save();
+            if ($data->usage == $data->used){
+                $data->availed = 1;
+                $data->save();
+            }
             return true;
         }
         return false;

@@ -14,7 +14,7 @@ class CouponController extends Controller
     public function index(Request $request){
         try {
             if (request()->ajax()) {
-                return datatables()->of(Coupon::get())
+                return datatables()->of(Coupon::orderBy('id', 'desc')->get())
                     ->addColumn('action', function ($data) {
                         return '<a title="View" href="coupon/show/' . $data->id . '" class="btn btn-dark btn-sm"><i class="fas fa-eye"></i></a>&nbsp;<a title="Edit" href="coupon/edit/' . $data->id . '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>&nbsp;<button title="Delete" type="button" name="delete" id="' . $data->id . '" class="delete btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>';
                     })->rawColumns(['action'])->make(true);
@@ -37,6 +37,7 @@ class CouponController extends Controller
                 'code' => 'required|string',
                 'value' => 'required|numeric',
                 'type' => 'required|string',
+                'usage' => 'required|numeric',
             ]);
 
             if ($validator->fails()){
@@ -50,16 +51,32 @@ class CouponController extends Controller
                 'expiration_date' => $request->input('expiration_date') ?? null,
                 'min_order' => $request->input('min_order'),
                 'status' => 1,
+                'all_users' => ($request->input('allUsers'))?1:0
             ]);
-            if ($request->has('customers') && !empty($request->input('customers'))){
-               foreach ($request->input('customers') as $customer){
-                   CouponUser::create([
-                       'coupon_id' => $coupon->id,
-                       'user_id' => $customer,
-                       'availed' => 0
-                   ]);
-               }
+
+            if($request->input('allUsers')){
+                $allCustomers = User::all()->where('role_id', 2);
+                foreach($allCustomers as $customer){
+                    CouponUser::create([
+                        'coupon_id' => $coupon->id,
+                        'user_id' => $customer->id,
+                        'availed' => 0,
+                        'usage' => $request->input('usage')
+                    ]);
+                }
+            }else{
+                if ($request->has('customers') && !empty($request->input('customers'))){
+                    foreach ($request->input('customers') as $customer){
+                        CouponUser::create([
+                            'coupon_id' => $coupon->id,
+                            'user_id' => $customer,
+                            'availed' => 0,
+                            'usage' => $request->input('usage')
+                        ]);
+                    }
+                 }
             }
+
 
 
             /*if ($request->has('customers') && $request->input('customers') != null && $request->input('customers') != ""){
@@ -89,6 +106,7 @@ class CouponController extends Controller
                 'code' => 'required|string',
                 'value' => 'required|numeric',
                 'type' => 'required|string',
+                'usage' => 'required|numeric'
             ]);
 
             if ($validator->fails()){
@@ -100,31 +118,68 @@ class CouponController extends Controller
             $coupon->type = $request->input('type') ?? 'value';
             $coupon->expiration_date = $request->input('expiration_date') ?? null;
             $coupon->min_order = $request->input('min_order');
+            $coupon->all_users = ($request->input('allUsers'))?1:0;
             $coupon->save();
 
-            CouponUser::where('coupon_id', $id)->delete();
-            if ($request->has('customers') && !empty($request->input('customers'))){
-                foreach ($request->input('customers') as $customer){
-                    CouponUser::create([
-                        'coupon_id' => $coupon->id,
-                        'user_id' => $customer,
-                        'availed' => 0
-                    ]);
+            $updateData = array('usage' => $request->input('usage'));
+            $usage = $coupon->couponUsers[0]->usage;
+
+            if ($usage < $request->input('usage')){
+                $updateData['availed'] = 0;
+            }
+
+            $couponUsers = CouponUser::where('coupon_id', $id)->get();
+            if($request->input('allUsers')){
+                $couponUsers->each(function($couponUser) use($request, $updateData){
+                    $couponUser->update($updateData);
+                });
+            }else{
+                if ($request->has('customers') && !empty($request->input('customers'))){
+                    $customerIds = array();
+                    foreach ($couponUsers as $couponUser){
+                        $customerIds[] = $couponUser->user_id;
+                    }
+                    $removedUsers = array_diff($customerIds, $request->input('customers'));
+                    foreach ($removedUsers as $removedUser){
+                        if (in_array($removedUser, $customerIds)){
+                            CouponUser::where('coupon_id', $id)->where('user_id', $removedUser)->delete();
+                        }
+                    }
+
+                    foreach ($request->input('customers') as $customer){
+                        CouponUser::updateOrCreate(
+                            [
+                                'coupon_id' => $coupon->id,
+                                'user_id' => $customer
+                            ],
+                            $updateData
+                        );
+                    }
                 }
             }
 
-            return redirect(route('admin.coupons'))->with('success', 'Coupon Updated');
+            return redirect()->back()->with('success', 'Coupon Updated');
         }
 
         $userIds = array();
         if ($coupon->couponUsers != null){
             foreach ($coupon->couponUsers as $cu){
                 $userIds[] = $cu->user_id;
+                if($cu->usage <= $cu->used){
+                    $cu->availed = 1;
+                    $cu->save();
+                }
             }
         }
         $userIds = (!empty($userIds)) ? implode(',', $userIds) : "";
         $customers = User::where('role_id', 2)->get();
-        return view('admin.coupon.edit',compact('coupon', 'customers', 'userIds'));
+        $couponUser = null;
+        foreach($coupon->couponUsers as $couponUsers){
+            $couponUser = $couponUsers;
+            break;
+        }
+        // dd($couponUsers);
+        return view('admin.coupon.edit',compact('coupon', 'customers', 'userIds','couponUser'));
     }
 
     public function destroy($id){

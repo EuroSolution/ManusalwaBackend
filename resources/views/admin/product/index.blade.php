@@ -46,7 +46,8 @@
                                             <th>Image</th>
                                             <th>Product</th>
                                             <th>Category</th>
-                                            <th>Action</th>
+                                            <th>Type</th>
+                                            <th width="100px">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -120,10 +121,7 @@
                     {data: 'image', name: 'image'},
                     {data: 'name', name: 'name'},
                     {data: 'category_id', name: 'category_id'},
-                    // {data: 'product_current_price', name: 'product_current_price'},
-                    // {data: 'product_qty', name: 'product_qty'},
-                    // {data: 'location', name: 'location'},
-                    // {data: 'status', name: 'status'},
+                    {data: 'type', name: 'type'},
                     {data: 'action', name: 'action', orderable: false}
                 ]
 
