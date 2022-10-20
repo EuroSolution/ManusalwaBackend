@@ -35,7 +35,7 @@ class Coupon extends Model
                 })->where('code', $couponCode)->whereStatus(1)->first();
 
             if ($coupon != null){
-                if($coupon->expiration_date != null && $coupon->expiration_date <= date('Y-m-d')){
+                if($coupon->expiration_date != null && $coupon->expiration_date < date('Y-m-d')){
                     $couponError = true;
                     $couponErrorMsg = "Voucher has been Expired.";
                 }

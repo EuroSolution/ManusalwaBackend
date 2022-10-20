@@ -144,7 +144,7 @@
 @section('script')
     <script>
         var counter = {{$countSizes}}; console.log(counter);
-        if (counter == 3){
+        if (counter == 4){
             $(".addMoreSizes").attr('disabled', 'disabled');
         }
         function addMoreSizes(){

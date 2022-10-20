@@ -45,8 +45,7 @@ class ProfileController extends Controller
     public function vouchers(Request $request){
         $vouchers = Coupon::whereHas('couponUsers', function ($q){
             $q->where('user_id', Auth::id())->where('availed', 0);
-        })->where('expiration_date', '<=', date('Y-m-d'))->get();
-
+        })->where('expiration_date', '>=', date('Y-m-d'))->get();
         return $this->success($vouchers);
     }
 
