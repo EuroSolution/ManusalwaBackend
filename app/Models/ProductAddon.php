@@ -10,7 +10,7 @@ class ProductAddon extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'addon_item_id', 'price', 'discounted_price'
+        'product_id', 'addon_group_id', 'addon_item_id', 'price', 'discounted_price'
     ];
     public $timestamps = false;
 
