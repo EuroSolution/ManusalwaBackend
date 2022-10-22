@@ -190,12 +190,13 @@ $notifications = \App\Models\Notification::where('receiver_id', 1)->where('read_
 <script>
     // Your web app's Firebase configuration
     var firebaseConfig = {
-        apiKey: "AIzaSyAGX31HWcnrxSIycYLwwWpbhyFQTD9SrXc",
-        authDomain: "pizzeriaroma-ed2dd.firebaseapp.com",
-        projectId: "pizzeriaroma-ed2dd",
-        storageBucket: "pizzeriaroma-ed2dd.appspot.com",
-        messagingSenderId: "945625842302",
-        appId: "1:945625842302:web:2fbb4b5d6d535e517d8e2f"
+        apiKey: "AIzaSyA81hB4BMSN8lyUDs-JM7XW1c9cPuuN0wc",
+        authDomain: "manusalwa-ed3ed.firebaseapp.com",
+        projectId: "manusalwa-ed3ed",
+        storageBucket: "manusalwa-ed3ed.appspot.com",
+        messagingSenderId: "573382697142",
+        appId: "1:573382697142:web:151650f7945a43b93a0617",
+        measurementId: "G-M9CV66398Q"
     };
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
