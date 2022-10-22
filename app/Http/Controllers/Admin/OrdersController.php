@@ -144,7 +144,7 @@ class OrdersController extends Controller
 //                    'receiver_id' => $orderData->customer_id,
 //                ]);
 //            }
-            $this->sendPushNotification('Pizzeria Roma', 'Order Status Updated to '.$request->val, [], [$order->user->id]);
+            $this->sendPushNotification(env('APP_NAME'), 'Order Status Updated to '.$request->val, [], [$order->user->id]);
             $order->update(['order_status' => $request->val]);
             return true;
         } else {
