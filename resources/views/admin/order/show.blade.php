@@ -12,7 +12,7 @@
                         <div class="col-md-4"></div>
                         <div class="col-md-2">
 {{--                            <button type="button" class="btn btn-primary" onclick="history.back();">Back</button>--}}
-                            <button type="button" class="btn btn-primary float-right" onclick="window.print();">Print</button>
+                            <a href="{{route('admin.printReceipt', $order->id)}}" target="_blank" class="btn btn-primary float-right">Print</a>
                         </div>
                     </div>
                 </div>

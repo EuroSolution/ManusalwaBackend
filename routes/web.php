@@ -86,6 +86,7 @@ Route::middleware('admin')->name('admin.')->group(function (){
     Route::get('order/show/{id}', [OrdersController::class, 'show'])->name('showOrder');
     Route::delete('orders/destroy/{id}', [OrdersController::class, 'destroy'])->name('destroyOrder');
     Route::post('order/changeOrderStatus/{id}', [OrdersController::class, 'changeOrderStatus'])->name('changeOrderStatus');
+    Route::get('order/print-receipt/{id}', [OrdersController::class, 'printReceipt'])->name('printReceipt');
 
     Route::get('attributes', [AttributeController::class, 'index'])->name('attributes');
     Route::get('getAttributeItemsById', [AttributeController::class, 'getAttributeItemsById'])->name('getAttributeItemsById');
@@ -138,7 +139,7 @@ Route::middleware('staff')->name('staff.')->group(function(){
 });
 
 Route::get('/cache-clear', function(){
-    
+
     $q = request()->get('query');
 
     try{

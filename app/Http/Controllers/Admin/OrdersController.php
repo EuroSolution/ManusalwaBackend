@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
 use App\Models\Order;
+use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -150,6 +152,103 @@ class OrdersController extends Controller
         } else {
             return false;
         }
+    }
+    public function printReceipt(Request $request, $id){
+        $order = Order::with('orderItems', 'user', 'orderItems.product', 'orderItems.orderItemAddons')->find($id);
+        $setting = Setting::first();
+        $data = array(
+            'logo' => $setting->logo,
+            'order_number' => $order->order_number,
+            'date'  => $order->created_at,
+            'address' => $order->address,
+            'customer' => $order->name,
+            'phone' => $order->phone,
+            'subtotal' => $order->subtotal,
+            'tax' => $order->tax,
+            'delivery_fee' => $order->delivery_fee,
+            'discount' => $order->discount,
+            'total_amount' => $order->total_amount,
+            'currency' => $setting->currency,
+        );
+        $items = array();
+        /*if (!empty($order->orderItems) && $order->orderItems != null) {
+            foreach ($order->orderItems as $orderItem) {
+                $items[] = array(
+                    'product' => $orderItem->product->name,
+                    'price' => $orderItem->price,
+                    'size' => $orderItem->size,
+                    'quantity' => $orderItem->quantity ?? 1,
+                    'total' => ($orderItem->price * $orderItem->quantity ?? 1)
+                );
+                if ($orderItem->orderItemAddons != null && !empty($orderItem->orderItemAddons)) {
+                    foreach ($orderItem->orderItemAddons as $orderItemAddon) {
+                        $items[] = array(
+                            'product' => $orderItemAddon->addon_item,
+                            'price' => $orderItemAddon->price,
+                            'size' => $orderItemAddon->size,
+                            'quantity' => $orderItemAddon->quantity ?? 1,
+                            'total' => ($orderItemAddon->price * $orderItemAddon->quantity ?? 1)
+                        );
+                    }
+                }
+            }
+        }*/
+
+        $dealId = "--";
+        foreach($order->orderItems as $item){
+            if ($item->deal_id != null){
+                if ($dealId != $item->deal_id){
+                    $dealId = $item->deal_id;
+                    $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
+                        ->where('id',$item->deal_id)->first();
+                    $dealsArray = array(
+                        'product' => $deal->name . ' (Deal)',
+                        'price' => $deal->price,
+                        'quantity' => $item->quantity ?? 1,
+                        'total' => ($deal->price * $item->quantity ?? 1)
+                    );
+                    $dealItemsArray[] = $item;
+                }else{
+                    $dealItemsArray[] = $item;
+                }
+            }else{
+                $items[] = array(
+                    'product' => $item->product->name,
+                    'price' => $item->price,
+                    'size' => $item->size,
+                    'quantity' => $item->quantity ?? 1,
+                    'total' => ($item->price * $item->quantity ?? 1)
+                );
+                if ($item->orderItemAddons != null && !empty($item->orderItemAddons)) {
+                    foreach ($item->orderItemAddons as $orderItemAddon) {
+                        $items[] = array(
+                            'product' => $orderItemAddon->addon_item,
+                            'price' => $orderItemAddon->price,
+                            'size' => $orderItemAddon->size,
+                            'quantity' => $orderItemAddon->quantity ?? 1,
+                            'total' => ($orderItemAddon->price * $orderItemAddon->quantity ?? 1)
+                        );
+                    }
+                }
+                //$normalItems[] = $item;
+            }
+        }
+
+        $orderItems = array();
+        if (!empty($dealItemsArray)){
+            $dealsArray['dealItems'] = $dealItemsArray;
+            $orderItems['deals'][] = $dealsArray;
+        }else{
+            $orderItems['deals'] = array();
+        }
+
+        //$orderItems['normalItems'] = $normalItems;
+
+        $data['items'] = $items;
+        $data['deals'] = $orderItems['deals'];
+
+        $pdf = Pdf::loadView('admin.order.reciept', $data)->setPaper('A5', 'portrait');
+        return $pdf->stream('invoice.pdf');
     }
 
 
