@@ -66,8 +66,6 @@ class OrdersController extends Controller
         $order = Order::where('id', $id)->with('orderItems', 'user', 'orderItems.product', 'orderItems.orderItemAddons',
             'orderItems.orderItemAttributes', 'payment', 'coupon')
             ->firstOrFail();
-        $dealsArray = array();
-        $dealItemsArray = array();
         $normalItems = array();
         $orderDetail = array(
             'order_no' => $order->order_number,
@@ -81,22 +79,41 @@ class OrdersController extends Controller
             'notes' => $order->notes,
         );
         $dealId = "--";
-        foreach($order->orderItems as $item){
+        $dealsArray = array();
+        $dealItemsArray = array();
+        $dealDataArray = array();
+        foreach($order->orderItems as $key => $item){
             if ($item->deal_id != null){
                 if ($dealId != $item->deal_id){
+                    if (!empty($dealItemsArray)){
+                        $dealDataArray['dealItems'] = $dealItemsArray;
+                        $dealItemsArray = array();
+                        $dealsArray[] = $dealDataArray;
+                        //$dealDataArray = array();
+                    }
                     $dealId = $item->deal_id;
                     $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                         ->where('id',$item->deal_id)->first();
-                    $dealsArray = array(
+                    $dealDataArray = array(
                         'id' => $deal->id,
                         'name' => $deal->name,
                         'description' => $deal->description,
                         'price' => $deal->price,
-                        'image' => $deal->image
+                        'image' => $deal->image,
+                        //'dealItems' => array()
                     );
                     $dealItemsArray[] = $item;
                 }else{
                     $dealItemsArray[] = $item;
+                    //$dealsArray['items'] = $item;
+                }
+                if ((count($order->orderItems) - 1) == $key){
+                    if (!empty($dealItemsArray)){
+                        $dealDataArray['dealItems'] = $dealItemsArray;
+                        $dealItemsArray = array();
+                        $dealsArray[] = $dealDataArray;
+                        //$dealDataArray = array();
+                    }
                 }
             }else{
                 $normalItems[] = $item;
@@ -104,9 +121,9 @@ class OrdersController extends Controller
         }
 
         $orderItems = array();
-        if (!empty($dealItemsArray)){
-            $dealsArray['dealItems'] = $dealItemsArray;
-            $orderItems['deals'][] = $dealsArray;
+        if (!empty($dealsArray)){
+            //$dealsArray['dealItems'] = $dealItemsArray;
+            $orderItems['deals'] = $dealsArray;
         }else{
             $orderItems['deals'] = array();
         }
