@@ -100,6 +100,23 @@ class CouponController extends Controller
 
     public function edit(Request $request, $id){
         $coupon = Coupon::with('couponUsers')->findOrFail($id);
+        $customers = User::where('role_id', 2)->get();
+
+        $notExistCustomers = [];
+        foreach($customers as $user){
+            foreach($coupon->couponUsers as $cp){
+                $existUser = 1;
+                if($user->id==$cp->user_id){
+                    $existUser = 0;
+                    break;
+                }
+            }
+
+            if($existUser){
+
+                $notExistCustomers[] = $user->id;
+            }
+        }
 
         if ($request->method() == 'POST'){
             $validator = Validator::make($request->all(), [
@@ -133,6 +150,16 @@ class CouponController extends Controller
                 $couponUsers->each(function($couponUser) use($request, $updateData){
                     $couponUser->update($updateData);
                 });
+
+                foreach($notExistCustomers as $notExistCustomer){
+                    CouponUser::create([
+                        'coupon_id' => $coupon->id,
+                        'user_id' => $notExistCustomer,
+                        'availed' => 0,
+                        'usage' => $request->input('usage')
+                    ]);
+                }
+                
             }else{
                 if ($request->has('customers') && !empty($request->input('customers'))){
                     $customerIds = array();
