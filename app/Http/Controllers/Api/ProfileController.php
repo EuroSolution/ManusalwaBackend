@@ -107,6 +107,7 @@ class ProfileController extends Controller
                             'description' => $deal->description,
                             'price' => $deal->price,
                             'image' => $deal->image,
+                            'quantity' => $item->quantity,
                             //'dealItems' => array()
                         );
                         $dealItemsArray[] = $item;
