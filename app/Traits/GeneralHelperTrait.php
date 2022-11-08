@@ -69,7 +69,7 @@ trait GeneralHelperTrait
             }else{
                 return asset('admin/dist/img/placeholder.png');
             }
-            
+
         }catch(\Exception $ex){
 
         }
@@ -142,7 +142,7 @@ trait GeneralHelperTrait
                 $userFcmTokens = $userFcmTokens->whereIn('fcm_token', $fcmTokens);
             }
             if (!empty($userIds)){
-                $userFcmTokens = $userFcmTokens->whereIn('id', $fcmTokens);
+                $userFcmTokens = $userFcmTokens->whereIn('id', $userIds);
             }
             $userFcmTokens = $userFcmTokens->whereNotNull('fcm_token')
                 ->pluck('fcm_token')->toArray();
