@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,17 +15,19 @@ class SendPushNotification extends Notification
     protected $title;
     protected $message;
     protected $fcmTokens;
+    protected $url;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($title, $message, $fcmTokens)
+    public function __construct($title, $message, $url, $fcmTokens)
     {
         $this->title = $title;
         $this->message = $message;
         $this->fcmTokens = $fcmTokens;
+        $this->url = $url;
     }
 
     /**
@@ -67,9 +70,13 @@ class SendPushNotification extends Notification
 
     public function toFirebase($notifiable)
     {
+        $setting = Setting::first();
         return (new FirebaseMessage)
             ->withTitle($this->title)
             ->withBody($this->message)
+            ->withClickAction($this->url)
+            ->withImage($setting->logo)
+            ->withIcon($setting->logo)
             ->withPriority('high')->asMessage($this->fcmTokens);
     }
 }

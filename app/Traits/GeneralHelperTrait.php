@@ -135,7 +135,7 @@ trait GeneralHelperTrait
         }
     }
 
-    protected function sendPushNotification($title, $message, $fcmTokens=array(), $userIds=array()){
+    protected function sendPushNotification($title, $message, $url="", $fcmTokens=array(), $userIds=array()){
         try {
             $userFcmTokens = User::query();
             if (!empty($fcmTokens)){
@@ -147,7 +147,7 @@ trait GeneralHelperTrait
             $userFcmTokens = $userFcmTokens->whereNotNull('fcm_token')
                 ->pluck('fcm_token')->toArray();
 
-            Notification::send(null, new SendPushNotification($title, $message, $userFcmTokens));
+            Notification::send(null, new SendPushNotification($title, $message, $url, $userFcmTokens));
 
             return array('success'=> true, 'message' => 'Notification Sent Successfully');
         }catch (Exception $ex){

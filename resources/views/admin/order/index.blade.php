@@ -98,7 +98,7 @@
                 <div class="row">
                     <div class="col-12">
 
-                        <!-- /.card -->
+                        <div id="notification"></div>
 
                         <div class="card">
                             <!-- /.card-header -->
@@ -156,8 +156,9 @@
 @section('script')
     <script src="{{asset('admin/datatables/datatables.net/js/jquery.dataTables.min.js')}}"></script>
     <script>
+        var DataTable;
         $(document).ready(function () {
-            var DataTable = $("#example1").DataTable({
+            DataTable = $("#example1").DataTable({
                 dom: "Blfrtip",
                 buttons: [{
                     extend: "copy",

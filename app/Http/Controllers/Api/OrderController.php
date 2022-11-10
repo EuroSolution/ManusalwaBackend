@@ -168,8 +168,8 @@ class OrderController extends Controller
             try{
                 $messageBody = "Thank you for your order. \nYour Order Number is $order_no \n\n ".env('APP_NAME');
                 $this->sendMessageToClient(Auth::user()->phone, $messageBody);
-                $this->sendPushNotification(env('APP_NAME'), 'Order placed', [], [Auth::id()]);
-                $this->sendPushNotification('New Order', 'Order No#'.$order_no, [], [1]);
+                $this->sendPushNotification(env('APP_NAME'), 'Order placed', route('admin.orders'),[], [Auth::id()]);
+                $this->sendPushNotification('New Order', 'Order No#'.$order_no, route('admin.orders'),[], [1]);
             }catch (\Exception $exception){}
             return $response;
         }catch (\Exception $ex){

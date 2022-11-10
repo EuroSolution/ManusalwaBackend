@@ -225,8 +225,27 @@ $notifications = \App\Models\Notification::where('receiver_id', 1)->where('read_
     initFirebaseMessagingRegistration();
 
     messaging.onMessage(function({data:{body,title}}){
-        new Notification(title, {body});
+        //new Notification(title, {body});
+        let message = new Notification(title, {body})
+        message.onclick = function(){
+            window.location = "{{route('admin.orders')}}";
+        };
+        @if(request()->route()->getName() == 'admin.orders')
+            reloadOrdersTable(title);
+        @endif
+        playSound();
     });
+
+    function reloadOrdersTable(title){
+        DataTable.ajax.reload();
+        $("#notification").append('<div class="alert alert-primary alert-dismissible fade show">' + title
+            +'<button type="button" class="close" data-dismiss="alert" aria-label="Close"> ' +
+            '<span aria-hidden="true">&times;</span> </button></div>');
+    }
+    function playSound(){
+        var audio = new Audio("{{asset('restaurant_city_song.mp3')}}");
+        audio.play();
+    }
 </script>
 </body>
 </html>

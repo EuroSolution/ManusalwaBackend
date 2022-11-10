@@ -147,7 +147,7 @@ class AdminController extends Controller
     }
 
     public function sendNotification(){
-        $resp = $this->sendPushNotification('Test', 'Test Notification');
+        $resp = $this->sendPushNotification('Test', 'Test Notification', route('admin.orders'));
         return $resp;
     }
 }
