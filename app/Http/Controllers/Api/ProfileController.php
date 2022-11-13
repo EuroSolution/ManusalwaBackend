@@ -105,7 +105,7 @@ class ProfileController extends Controller
                 if ($item->deal_id != null){
 
                     if ($dealReference != $item->reference_no){  
-                        
+
                         $dealId = $previousDealId ?? $item->deal_id;
 
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
@@ -127,7 +127,7 @@ class ProfileController extends Controller
                         $dealReference = $item->reference_no;
                         $dealIndex += 1;
                         $dealItemsArray[] = $item;
-                        $previousDealId = 0;
+                        $previousDealId = $item->deal_id;
                     }else{
                         $previousDealId = $item->deal_id;
                         $dealItemsArray[] = $item;
