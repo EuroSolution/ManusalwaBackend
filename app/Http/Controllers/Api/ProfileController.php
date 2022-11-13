@@ -92,6 +92,9 @@ class ProfileController extends Controller
             $dealReference = '';
             $dealIndex = 0;
 
+            //echo "<pre>";
+            //print_r($order->orderItems->toArray());
+            //die;
 
             foreach($order->orderItems as $key => $item){
 
@@ -101,12 +104,31 @@ class ProfileController extends Controller
 
                 if ($item->deal_id != null){
 
-                    if((count($order->orderItems) - 1) == $key){
+                    if ($dealReference != $item->reference_no){  
+                        $dealId = $item->deal_id;
+                        $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
+                            ->where('id',$item->deal_id)->first();
+
+                        $dealDataArray = array(
+                            'id' => $deal->id,
+                            'name' => $deal->name,
+                            'description' => $deal->description,
+                            'price' => $deal->price,
+                            'image' => $deal->image,
+                            'quantity' => $item->quantity,
+                            'dealItems' => $dealItemsArray
+                        );
+
+                        $orderDetail['orderItems']['deals'][$dealIndex]= $dealDataArray ;
+                        $dealItemsArray = [];
+                        $dealReference = $item->reference_no;
+                        $dealIndex += 1;
+                        $dealItemsArray[] = $item;
+                    }else{
                         $dealItemsArray[] = $item;
                     }
 
-                    if ($dealReference != $item->reference_no || (count($order->orderItems) - 1) == $key){  
-
+                    if ((count($order->orderItems) - 1) == $key){  
                         $dealId = $item->deal_id;
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                             ->where('id',$item->deal_id)->first();
@@ -126,11 +148,7 @@ class ProfileController extends Controller
                         $dealReference = $item->reference_no;
                         $dealIndex += 1;
                     }
- 
-                    if((count($order->orderItems) - 1) != $key){
-                        $dealItemsArray[] = $item;
-                    }
-                                        
+                    
                 }else{
                     $normalItems[] = $item;
                 }
