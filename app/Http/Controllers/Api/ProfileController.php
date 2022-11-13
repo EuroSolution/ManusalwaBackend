@@ -92,6 +92,8 @@ class ProfileController extends Controller
             $dealReference = '';
             $dealIndex = 0;
             $previousDealId = 0;
+            $previousOrderQty = 0;
+            
             //echo "<pre>";
             //print_r($order->orderItems->toArray());
             //die;
@@ -118,7 +120,7 @@ class ProfileController extends Controller
                                 'description' => $deal->description,
                                 'price' => $deal->price,
                                 'image' => $deal->image,
-                                'quantity' => $item->quantity,
+                                'quantity' => $previousOrderQty ?? $item->quantity,
                                 'dealItems' => $dealItemsArray
                             );
                         }
@@ -128,8 +130,10 @@ class ProfileController extends Controller
                         $dealIndex += 1;
                         $dealItemsArray[] = $item;
                         $previousDealId = $item->deal_id;
+                        $previousOrderQty = $item->quantity;
                     }else{
                         $previousDealId = $item->deal_id;
+                        $previousOrderQty = $item->quantity;
                         $dealItemsArray[] = $item;
                     }
 
