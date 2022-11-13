@@ -113,7 +113,8 @@ class CartController extends Controller
                                     'size' => $deal_item['size'] ?? "",
                                     'quantity' => $deal_item['quantity'] ?? 1,
                                     'deal_id' => $deal['id'],
-                                    'deal_item_id' => $deal_item['deal_item_id']
+                                    'deal_item_id' => $deal_item['deal_item_id'],
+                                    'reference_no' => $deal['reference_no'] ?? ''
                                 ]);
                                 if (isset($deal_item['deal_item_addons']) && !empty($deal_item['deal_item_addons'])) {
                                     foreach ($deal_item['deal_item_addons'] as $addonItem) {

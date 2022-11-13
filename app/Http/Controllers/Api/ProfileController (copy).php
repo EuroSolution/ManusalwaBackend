@@ -90,8 +90,6 @@ class ProfileController extends Controller
             $dealItemsArray = array();
             $dealDataArray = array();
             $dealReference = '';
-            $dealIndex = 0;
-
 
             foreach($order->orderItems as $key => $item){
 
@@ -100,17 +98,16 @@ class ProfileController extends Controller
                 }
 
                 if ($item->deal_id != null){
-
-                    if((count($order->orderItems) - 1) == $key){
-                        $dealItemsArray[] = $item;
-                    }
-
-                    if ($dealReference != $item->reference_no || (count($order->orderItems) - 1) == $key){  
-
+                    if ($dealId != $item->deal_id){
+                        if (!empty($dealItemsArray)){
+                            $dealDataArray['dealItems'] = $dealItemsArray;
+                            $dealItemsArray = array();
+                            $dealsArray[] = $dealDataArray;
+                            //$dealDataArray = array();
+                        }
                         $dealId = $item->deal_id;
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                             ->where('id',$item->deal_id)->first();
-
                         $dealDataArray = array(
                             'id' => $deal->id,
                             'name' => $deal->name,
@@ -118,27 +115,38 @@ class ProfileController extends Controller
                             'price' => $deal->price,
                             'image' => $deal->image,
                             'quantity' => $item->quantity,
-                            'dealItems' => $dealItemsArray
+                            //'dealItems' => array()
                         );
-
-                        $orderDetail['orderItems']['deals'][$dealIndex]= $dealDataArray ;
-                        $dealItemsArray = [];
-                        $dealReference = $item->reference_no;
-                        $dealIndex += 1;
-                    }
- 
-                    if((count($order->orderItems) - 1) != $key){
                         $dealItemsArray[] = $item;
+                    }else{
+                        $dealItemsArray[] = $item;
+                        //$dealsArray['items'] = $item;
                     }
-                                        
+                    if ((count($order->orderItems) - 1) == $key){
+                    //if ($dealReference != $item->reference_no){    
+                        if (!empty($dealItemsArray)){
+                            $dealDataArray['dealItems'] = $dealItemsArray;
+                            $dealItemsArray = array();
+                            $dealsArray[] = $dealDataArray;
+                            //$dealDataArray = array();
+                        }
+                        $dealReference = $item->reference_no;
+                    }
                 }else{
                     $normalItems[] = $item;
                 }
             }
 
             /*echo "<pre>";
-            print_r($orderDetail);
+            print_r($dealsArray);
             die;*/
+
+            if (!empty($dealsArray)){
+                //$dealsArray['dealItems'] = (array) $dealItemsArray;
+                $orderDetail['orderItems']['deals'] = (array) $dealsArray;
+            }else{
+                $orderDetail['orderItems']['deals'] = array();
+            }
 
             $orderDetail['orderItems']['normalItems'] = $normalItems;
             return $this->success($orderDetail);

@@ -120,6 +120,7 @@ class OrderController extends Controller
                         'quantity' => $cartItem->quantity,
                         'deal_id' => $cartItem->deal_id,
                         'deal_item_id' => $cartItem->deal_item_id,
+                        'reference_no' => $cartItem->reference_no ?? '',
                     ]);
 
                     if (!empty($cartItem->cartItemAddons) && $cartItem->cartItemAddons != null){
