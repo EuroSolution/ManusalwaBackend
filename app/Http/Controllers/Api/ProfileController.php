@@ -111,16 +111,17 @@ class ProfileController extends Controller
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                             ->where('id',$dealId )->first();
 
-                        $dealDataArray = array(
-                            'id' => $deal->id,
-                            'name' => $deal->name,
-                            'description' => $deal->description,
-                            'price' => $deal->price,
-                            'image' => $deal->image,
-                            'quantity' => $item->quantity,
-                            'dealItems' => $dealItemsArray
-                        );
-
+                        if($deal){    
+                            $dealDataArray = array(
+                                'id' => $deal->id,
+                                'name' => $deal->name,
+                                'description' => $deal->description,
+                                'price' => $deal->price,
+                                'image' => $deal->image,
+                                'quantity' => $item->quantity,
+                                'dealItems' => $dealItemsArray
+                            );
+                        }
                         $orderDetail['orderItems']['deals'][$dealIndex]= $dealDataArray ;
                         $dealItemsArray = [];
                         $dealReference = $item->reference_no;
