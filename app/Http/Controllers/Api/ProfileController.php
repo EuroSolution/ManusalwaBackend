@@ -93,7 +93,7 @@ class ProfileController extends Controller
             $dealIndex = 0;
             $previousDealId = 0;
             $previousOrderQty = 0;
-            
+
             //echo "<pre>";
             //print_r($order->orderItems->toArray());
             //die;
@@ -106,14 +106,14 @@ class ProfileController extends Controller
 
                 if ($item->deal_id != null){
 
-                    if ($dealReference != $item->reference_no){  
+                    if ($dealReference != $item->reference_no){
 
                         $dealId = $previousDealId ?? $item->deal_id;
 
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                             ->where('id',$dealId )->first();
 
-                        if($deal){    
+                        if($deal){
                             $dealDataArray = array(
                                 'id' => $deal->id,
                                 'name' => $deal->name,
@@ -137,8 +137,8 @@ class ProfileController extends Controller
                         $dealItemsArray[] = $item;
                     }
 
-                    if ((count($order->orderItems) - 1) == $key){  
-                        
+                    if ((count($order->orderItems) - 1) == $key){
+
                         $deal =  Deal::withTrashed()->select('id', 'name', 'description', 'price', 'image')
                             ->where('id',$item->deal_id)->first();
 
@@ -163,10 +163,9 @@ class ProfileController extends Controller
                 }
             }
 
-            /*echo "<pre>";
-            print_r($orderDetail);
-            die;*/
-
+            if(!isset($orderDetail['orderItems']['deals']) && empty($orderDetail['orderItems']['deals'])){
+                $orderDetail['orderItems']['deals'] = array();
+            }
             $orderDetail['orderItems']['normalItems'] = $normalItems;
             return $this->success($orderDetail);
         }else{
