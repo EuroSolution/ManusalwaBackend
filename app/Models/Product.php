@@ -27,4 +27,9 @@ class Product extends Model
     public function productAttributes(){
         return $this->hasMany(ProductAttribute::class, 'product_id', 'id');
     }
+
+    public function getProductionsByCategoryId($categoryId){
+
+        return $this->with(['sizes','addons'])->where('category_id',$categoryId)->get();
+    }
 }

@@ -54,6 +54,21 @@ class HomeController extends Controller
         }
     }
 
+    public function categories(Request $request){
+        try{
+
+            $categories = Category::get();
+            $sizes = array(
+                "small" => "small",
+                "medium" => "medium",
+                "large" => "large",
+            );
+            return $this->success(array('categories' => $categories, 'sizes' => $sizes));
+        }catch (\Exception $exception){
+            return $this->error($exception->getMessage());
+        }
+    }
+    
     public function deals(){
         try{
             $deals = Deal::with('dealItems', 'dealAddons')->where('status', 1)->orderBy('id', 'desc')->get();
@@ -177,4 +192,16 @@ class HomeController extends Controller
         return $this->success([],"Thank You for your Query. Admin will be contact you soon");
     }
 
+    public function getProductsByCategory(Request $request, $id){
+        try{
+            
+            $productObj = new Product();
+
+            $products = $productObj->getProductionsByCategoryId($id);
+            
+            return $this->success(array('products' => $products));
+        }catch (\Exception $exception){
+            return $this->error($exception->getMessage());
+        }
+    }
 }

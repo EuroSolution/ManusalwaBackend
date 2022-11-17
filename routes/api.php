@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('banners', [HomeController::class, 'banners']);
 Route::get('menu', [HomeController::class, 'menu']);
+Route::get('categories', [HomeController::class, 'categories']);
+Route::get('get-products-by-category/{id}', [HomeController::class, 'getProductsByCategory']);
 Route::get('deals', [HomeController::class, 'deals']);
 Route::get('deals/{id}', [HomeController::class, 'dealById']);
 Route::get('products', [HomeController::class, 'products']);
