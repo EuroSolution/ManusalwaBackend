@@ -29,9 +29,20 @@ class HomeController extends Controller
         }
     }
 
-    public function menu(){
+    public function menu(Request $request){
         try{
-            $categories = Category::with('products', 'products.sizes', 'products.addons', 'products.productAttributes')->get();
+            $categories = Category::with('products', 'products.sizes', 'products.addons',
+                'products.productAttributes');
+            if($request->has('page')){
+                $limit = 10;
+                $page = $request->page ?? 1;
+                $start = ($page > 1) ? $limit*($page-1) : 0;
+
+                $categories = $categories->whereHas('products', function ($q) use ($start, $limit){
+                    $q->skip($start)->take($limit);
+                });
+            }
+            $categories = $categories->get();
             $sizes = array(
                 "small" => "small",
                 "medium" => "medium",
