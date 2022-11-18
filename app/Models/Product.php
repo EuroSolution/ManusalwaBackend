@@ -28,8 +28,14 @@ class Product extends Model
         return $this->hasMany(ProductAttribute::class, 'product_id', 'id');
     }
 
-    public function getProductionsByCategoryId($categoryId){
+    public function getProductionsByCategoryId($categoryId ,$page = 1, $limit = 10){
 
-        return $this->with(['sizes','addons'])->where('category_id',$categoryId)->get();
+        $start = ($page > 1) ? $limit*($page-1) : 0;
+        
+        return $this->with(['sizes','addons'])
+                    ->where('category_id',$categoryId)
+                    ->skip($start)
+                    ->take($limit)
+                    ->get();
     }
 }

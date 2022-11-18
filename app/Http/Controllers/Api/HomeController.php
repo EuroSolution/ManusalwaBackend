@@ -197,9 +197,18 @@ class HomeController extends Controller
             
             $productObj = new Product();
 
-            $products = $productObj->getProductionsByCategoryId($id);
+            $page = 1;
+            $limit = 10;
+
+            if($request->has('page')){
+                $limit = 10;
+                $page = $request->page ?? 1;
+                $start = ($page > 1) ? $limit*($page-1) : 0;
+            }
+
+            $products = $productObj->getProductionsByCategoryId($id ,$page, $limit);
             
-            return $this->success(array('products' => $products));
+            return $this->success(array('products' => $products, 'page' => $page));
         }catch (\Exception $exception){
             return $this->error($exception->getMessage());
         }
