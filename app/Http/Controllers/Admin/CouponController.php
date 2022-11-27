@@ -211,9 +211,13 @@ class CouponController extends Controller
 
     public function destroy($id){
         $content = Coupon::find($id);
-        $content->delete();
-        CouponUser::where('coupon_id', $id)->delete();
-        echo 1;
+        if($content){
+            $content->delete();
+            CouponUser::where('coupon_id', $id)->delete();
+            echo 1;
+        }else{
+            echo 0;
+        }
     }
 
     public function changeStatus(Request $request, $id){

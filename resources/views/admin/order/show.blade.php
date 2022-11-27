@@ -178,7 +178,7 @@
                                                             <td>{{$addon->size}}</td>
                                                             <td>{{$addon->price}}</td>
                                                             <td>{{$addon->quantity}}</td>
-                                                            <td>{{number_format(($addon->quantity)*$addon->price, '2', '.')}}</td>
+                                                            <td>{{number_format(($addon->quantity)*$addon->price, '2', '.','')}}</td>
                                                         </tr>
                                                     @endforeach
                                                 @endif
