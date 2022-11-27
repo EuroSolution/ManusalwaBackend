@@ -84,6 +84,7 @@ class ProfileController extends Controller
                 'address' => $order->address,
                 'order_type' => $order->order_type,
                 'notes' => $order->notes,
+                'gst_percent' => $order->gst_percent,
             );
             $dealId = "--";
             $dealsArray = array();

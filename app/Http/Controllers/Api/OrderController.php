@@ -108,7 +108,8 @@ class OrderController extends Controller
                     'order_status' => 'Pending',
                     'coupon_id' => $couponId ?? null,
                     'is_deal' => $cart->is_deal,
-                    'source' => $cart->source ?? null
+                    'source' => $cart->source ?? null,
+                    'gst_percent' => $request->gst_percent ?? null,
 
                 ]);
                 foreach ($cart->cartItems as $cartItem){
