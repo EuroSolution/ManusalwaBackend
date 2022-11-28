@@ -111,7 +111,7 @@ class CartController extends Controller
                                     'product_id' => $product->id,
                                     'price' => $deal_item['price'] ?? $product->price,
                                     'size' => $deal_item['size'] ?? "",
-                                    'quantity' => $deal_item['quantity'] ?? 1,
+                                    'quantity' => $deal_item['quantity'] ?? $deal['quantity'] ?? 1,
                                     'deal_id' => $deal['id'],
                                     'deal_item_id' => $deal_item['deal_item_id'],
                                     'reference_no' => $deal['reference_no'] ?? ''
