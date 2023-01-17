@@ -104,6 +104,7 @@ class CouponController extends Controller
 
         $notExistCustomers = [];
         foreach($customers as $user){
+            $existUser = 0;
             foreach($coupon->couponUsers as $cp){
                 $existUser = 1;
                 if($user->id==$cp->user_id){
@@ -159,7 +160,7 @@ class CouponController extends Controller
                         'usage' => $request->input('usage')
                     ]);
                 }
-                
+
             }else{
                 if ($request->has('customers') && !empty($request->input('customers'))){
                     $customerIds = array();
