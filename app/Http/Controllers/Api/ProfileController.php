@@ -173,4 +173,13 @@ class ProfileController extends Controller
             return $this->error('Order Not Found');
         }
     }
+
+    public function deleteAccount(){
+        $user = User::find(Auth::id());
+        if ($user != null){
+            $user->delete();
+            return $this->success([], "Account deleted successfully");
+        }
+        return $this->error("Unauthorized");
+    }
 }

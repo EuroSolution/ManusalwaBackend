@@ -55,6 +55,7 @@ Route::prefix('user')->middleware(['auth:sanctum'])->group(function(){
     Route::get('orders', [ProfileController::class, 'orders']);
     Route::get('orders/{id}', [ProfileController::class, 'getOrderById']);
     Route::post('edit', [ProfileController::class, 'edit']);
+    Route::delete('delete-account', [ProfileController::class, 'deleteAccount']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function (){
