@@ -154,6 +154,13 @@
                     <p>Logout</p>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{route('admin.changePassword')}}"
+                   class="nav-link">
+                    <i class="nav-icon fa fa-lock"></i>
+                    <p>Change Password</p>
+                </a>
+            </li>
         </ul>
     </nav>
     <!-- /.sidebar-menu -->

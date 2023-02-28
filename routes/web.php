@@ -124,6 +124,7 @@ Route::middleware('admin')->name('admin.')->group(function (){
 
     Route::get('getAddonsAttributesByCategoryId/{id}', [CategoryController::class, 'getAddonsAttributesByCategoryId'])->name('getAddonsAttributesByCategoryId');
 
+    Route::match(['get','post'],'change-password', [AdminController::class, 'changePassword'])->name('changePassword');
 });
 Route::patch('/fcm-token', [AdminController::class, 'updateToken'])->name('fcmToken');
 Route::get('/send-notification',[AdminController::class,'sendNotification']);

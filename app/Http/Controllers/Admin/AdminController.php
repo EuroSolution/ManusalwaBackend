@@ -150,4 +150,41 @@ class AdminController extends Controller
         $resp = $this->sendPushNotification('Test', 'Test Notification', route('admin.orders'));
         return $resp;
     }
+
+    public function changePassword(Request $request){
+        $user = Auth::user();
+
+        if($request->method() == 'POST'){
+            $validator = Validator::make($request->all(),[
+                'oldPassword'       => 'required',
+                'newPassword'       => 'required',
+                'confirmPassword'   => 'required'
+            ]);
+
+            if($validator->fails()){
+                return redirect()->back()->withErrors($validator->errors())->withInput();   
+            }
+
+            if (Hash::check($request->input('oldPassword'), $user->password)) {
+                if($request->newPassword != $request->confirmPassword){
+
+                    return redirect()->back()->with('error', 'Your Confirm And New Password Was Not Same! ');
+                }else{
+    
+                    try{
+                        $user->password = Hash::make($request->newPassword);
+                        $user->save();
+                        return redirect()->back()->with('success', 'Your Password Has Been Changed');
+                    }catch(\Exception $ex){
+                        return redirect()->back()->with('error', 'query error');
+                    }
+                }
+            }else{
+
+                return redirect()->back()->with('error', 'Your Old Password Don\'t Match! ');
+            }
+
+        }
+        return view('admin.change-password');
+    }
 }
