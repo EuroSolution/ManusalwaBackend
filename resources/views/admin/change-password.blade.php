@@ -39,7 +39,7 @@
 
                                     <div class="form-group">
                                         <label for="oldPassword">Old Password</label>
-                                        <input type="password" class="form-control @error('oldPassword') is-invalid @enderror" name="oldPassword" id="oldPassword" value="{{$content->oldPassword?? old('oldPassword')}}" placeholder="Old Password" required>
+                                        <input type="password" class="form-control @error('oldPassword') is-invalid @enderror" name="oldPassword" id="oldPassword" value="{{old('oldPassword')}}" placeholder="Old Password" required>
                                         @error('oldPassword')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="newPassword">New Password</label>
-                                        <input type="password" class="form-control @error('newPassword') is-invalid @enderror" name="newPassword" id="newPassword" value="{{$content->newPassword?? old('newPassword')}}" placeholder="New Password" >
+                                        <input type="password" class="form-control @error('newPassword') is-invalid @enderror" name="newPassword" id="newPassword" value="{{old('newPassword')}}" placeholder="New Password" required>
                                         @error('newPassword')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -57,7 +57,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="confirmPassword">Confirm Password</label>
-                                        <input type="password" class="form-control @error('confirmPassword') is-invalid @enderror" name="confirmPassword" id="confirmPassword" value="{{$content->confirmPassword?? old('confirmPassword')}}" placeholder="Confirm Password" required>
+                                        <input type="password" class="form-control @error('confirmPassword') is-invalid @enderror" name="confirmPassword" id="confirmPassword" value="{{old('confirmPassword')}}" placeholder="Confirm Password" required>
                                         @error('confirmPassword')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

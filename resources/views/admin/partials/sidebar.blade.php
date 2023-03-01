@@ -148,17 +148,17 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{route('admin.logout')}}"
-                   class="nav-link">
-                    <i class="nav-icon fa fa-lock"></i>
-                    <p>Logout</p>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{{route('admin.changePassword')}}"
                    class="nav-link">
                     <i class="nav-icon fa fa-lock"></i>
                     <p>Change Password</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{route('admin.logout')}}"
+                   class="nav-link">
+                    <i class="nav-icon fa fa-lock"></i>
+                    <p>Logout</p>
                 </a>
             </li>
         </ul>

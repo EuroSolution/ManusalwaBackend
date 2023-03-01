@@ -168,7 +168,7 @@ class AdminController extends Controller
             if (Hash::check($request->input('oldPassword'), $user->password)) {
                 if($request->newPassword != $request->confirmPassword){
 
-                    return redirect()->back()->with('error', 'Your Confirm And New Password Was Not Same! ');
+                    return redirect()->back()->withInput()->with('error', 'Your Confirm And New Password Was Not Same! ');
                 }else{
     
                     try{
@@ -181,7 +181,7 @@ class AdminController extends Controller
                 }
             }else{
 
-                return redirect()->back()->with('error', 'Your Old Password Don\'t Match! ');
+                return redirect()->back()->withInput()->with('error', 'Your Old Password Don\'t Match! ');
             }
 
         }
