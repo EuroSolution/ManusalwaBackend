@@ -21,8 +21,9 @@ class HomeController extends Controller
     public function banners(){
         try{
             $banners = Banner::where('status', 1)->get();
-            $products = Product::with('category', 'sizes', 'addons', 'productAttributes')
-                ->orderBy('id', 'desc')->take(10)->get();
+            $products = Product::with('category', 'sizes')
+                ->withCount('sizes', 'addonItems as addons_count', 'attributeItems as attributes_count')
+                ->orderBy('id', 'desc')->where('is_popular', 1)->take(10)->get();
             return $this->success(array('banners' => $banners, 'popularProducts' => $products));
         }catch (\Exception $exception){
             return $this->error($exception->getMessage());
@@ -31,9 +32,9 @@ class HomeController extends Controller
 
     public function menu(Request $request){
         try{
-            $categories = Category::with('products', 'products.sizes', 'products.addons',
-                'products.productAttributes');
-            if($request->has('page')){
+            $categories = Category::query();
+
+            /*if($request->has('page')){
                 $limit = 10;
                 $page = $request->page ?? 1;
                 $start = ($page > 1) ? $limit*($page-1) : 0;
@@ -41,13 +42,16 @@ class HomeController extends Controller
                 $categories = $categories->whereHas('products', function ($q) use ($start, $limit){
                     $q->skip($start)->take($limit);
                 });
+            }*/
+            $categories = $categories->orderBy('sort_order', 'ASC')->get();
+            foreach ($categories as $category){
+                $category['products'] = Product::with('sizes')->withCount('sizes', 'addonItems as addons_count', 'attributeItems as attributes_count')
+                    ->where('category_id', $category->id)->get();
             }
-            $categories = $categories->get();
-            $sizes = array(
-                "small" => "small",
-                "medium" => "medium",
-                "large" => "large",
-            );
+
+
+
+            $sizes = $this->getSizes();
             return $this->success(array('categories' => $categories, 'sizes' => $sizes));
         }catch (\Exception $exception){
             return $this->error($exception->getMessage());
